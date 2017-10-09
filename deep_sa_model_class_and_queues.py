@@ -548,7 +548,7 @@ if __name__ == '__main__':
                         help='Directory for storing input data')
 
     parser.add_argument('--log_dir', type=str,
-                        default='./tensorboard',
+                        default='../dnn-sa-tensorboard',
                         help='Summaries log directory')
 
     parser.add_argument('--batch_size', type=int,
