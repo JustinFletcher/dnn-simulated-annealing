@@ -23,6 +23,7 @@ from tfevaluator import *
 # Constants used for dealing with the files, matches convert_to_records.
 TRAIN_FILE = 'train.tfrecords'
 VALIDATION_FILE = 'validation.tfrecords'
+IMAGE_PIXELS = 28 * 28
 
 
 def read_and_decode(filename_queue):
@@ -45,10 +46,9 @@ def read_and_decode(filename_queue):
     # Convert from a scalar string tensor (whose single string has
     # length mnist.IMAGE_PIXELS) to a uint8 tensor with shape
     # [mnist.IMAGE_PIXELS].
-    # TODO: Require specification, rather than mnist dependence.
     image = tf.decode_raw(features['image_raw'], tf.uint8)
-    image.set_shape([mnist.IMAGE_PIXELS])
-    print(mnist.IMAGE_PIXELS)
+    image.set_shape([IMAGE_PIXELS])
+
     # OPTIONAL: Could reshape into a 28x28 image and apply distortions
     # here.  Since we are not applying any distortions in this
     # example, and the next step expects the image to be flattened
@@ -91,7 +91,7 @@ def inputs(train, batch_size, num_epochs):
 
         # Produce a queue of files to read from.
         filename_queue = tf.train.string_input_producer([filename],
-                                                        num_epochs=num_epochs)
+                                                        capacity=1000)
 
         # Even when reading in multiple threads, share the filename queue.
         image, label = read_and_decode(filename_queue)
@@ -102,10 +102,9 @@ def inputs(train, batch_size, num_epochs):
         images, sparse_labels = tf.train.shuffle_batch(
             [image, label],
             batch_size=batch_size,
-            num_threads=2,
-            capacity=1000 + 3 * batch_size,
-            # Ensures a minimum amount of shuffling of examples.
-            min_after_dequeue=1000)
+            capacity=1000000.0 * batch_size,
+            num_threads=15,
+            min_after_dequeue=1)
 
     return images, sparse_labels
 
@@ -331,10 +330,96 @@ class Model:
 
         return error
 
-# TODO: Convert to QueueRunners
-
 
 def train():
+
+    # Get input data.
+    images, labels = inputs(train=True,
+                            batch_size=FLAGS.batch_size,
+                            num_epochs=FLAGS.num_epochs)
+
+    model = Model(images, labels)
+
+    # Instantiate a TensorFlow state object to be annealed.
+    tf_state = TensorFlowState()
+
+    # Instantiate a TensorFlow state perturber.
+    tf_perturber = TensorFlowPerturberFSA(FLAGS.learning_rate)
+
+    # Instantiate a TensorFlow cost evaluator.
+    tf_cost_evaluator = TensorFlowCostEvaluator(model.loss)
+
+    def reject(t, d):
+
+        return(False)
+
+    def fsa_acceptance_probability(t, d):
+
+        return(np.exp(-d / t) > np.random.rand())
+
+    # merged = tf.summary.merge_all()
+
+    # Instantiate a session and initialize it.
+    sv = tf.train.Supervisor(logdir=FLAGS.log_dir, save_summaries_secs=10.0)
+
+    with sv.managed_session() as sess:
+
+        tf_state.start(sess=sess)
+        tf_perturber.start(sess=sess)
+        tf_cost_evaluator.start(sess=sess)
+
+        # Instantiate an Annealer that, when called, increments the annealing.
+        annealer = Annealer(tf_state, tf_perturber, tf_cost_evaluator,
+                            fsa_temperature, fsa_acceptance_probability,
+                            FLAGS.init_temp)
+        # sv.start_standard_services(sess=sess)
+
+        # sv.start_queue_runners()
+
+        # Initailize the variables.
+        sess.run(init_local)
+        sess.run(init_global)
+
+        # Initiate the queue runners.
+        threads = tf.train.start_queue_runners(sess=sess, coord=sv.coord)
+
+        print(threads)
+
+        # Initialize some time keeping variables.
+        total_time = 0
+        i_delta = 0
+
+        # Iterate, training the model.
+        for i in range(FLAGS.max_steps):
+
+            # Start keeping time.
+            i_start = time.time()
+
+            # Run the optimizer.
+            annealer()
+
+            # if sv.should_stop():
+            #     break
+
+            # Record the time.
+            i_stop = time.time()
+            i_delta = i_stop - i_start
+            total_time = total_time + i_delta
+
+            # If we have reached a testing interval, test.
+            if i % FLAGS.test_interval == 0:
+
+                # Compute loss over the test set.
+                loss = sess.run(model.loss)
+                print('Step %d:  loss = %.2f, t = %.6f, total_t = %.2f, ' % (i, loss, i_delta, total_time))
+
+    sv.request_stop()
+    sv.coord.join()
+    sv.stop()
+    sess.close()
+
+
+def train_b():
 
     # Get input data.
     images, labels = inputs(train=True,
@@ -403,13 +488,12 @@ def train():
             if i % FLAGS.test_interval == 0:
 
                 # Compute loss over the test set.
-                summary, error, loss = sess.run([merged,
-                                                 model.error,
+                summary, error, loss = sess.run([model.error,
                                                  model.loss])
                 print('Step %d: loss = %.2f, error = %.2f, t = %.2f, t_total = %.2f, ' % (i, loss, error, i_delta, total_time))
 
-                test_writer.add_summary(summary, i)
-                test_writer.add_summary(summary, i)
+                # test_writer.add_summary(summary, i)
+                # test_writer.add_summary(summary, i)
 
             # Iterate, training the network.
             else:
@@ -417,7 +501,7 @@ def train():
                 # Train the model on the batch.
                 annealer()
                 summary = sess.run(merged)
-                train_writer.add_summary(summary, i)
+                # train_writer.add_summary(summary, i)
 
             i_stop = time.time()
             i_delta = i_stop - i_start
@@ -484,7 +568,7 @@ if __name__ == '__main__':
                         help='Keep probability for output layer dropout.')
 
     parser.add_argument('--init_temp', type=float,
-                        default=100,
+                        default=10,
                         help='Initial temperature for SA algorithm')
 
     FLAGS, unparsed = parser.parse_known_args()
