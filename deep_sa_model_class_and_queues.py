@@ -546,7 +546,7 @@ if __name__ == '__main__':
     parser.add_argument('--test_interval', type=int, default=100,
                         help='Number of steps between test set evaluations.')
 
-    parser.add_argument('--learning_rate', type=float, default=0.01,
+    parser.add_argument('--learning_rate', type=float, default=0.001,
                         help='Initial learning rate')
 
     parser.add_argument('--data_dir', type=str,
