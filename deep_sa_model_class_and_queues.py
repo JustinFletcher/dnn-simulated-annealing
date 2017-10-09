@@ -338,7 +338,12 @@ def train():
                             batch_size=FLAGS.batch_size,
                             num_epochs=FLAGS.num_epochs)
 
+    # Instantiate model.
     model = Model(images, labels)
+
+    # Create varaible initialization ops.
+    init_local = tf.local_variables_initializer()
+    init_global = tf.global_variables_initializer()
 
     # Instantiate a TensorFlow state object to be annealed.
     tf_state = TensorFlowState()
@@ -372,6 +377,7 @@ def train():
         annealer = Annealer(tf_state, tf_perturber, tf_cost_evaluator,
                             fsa_temperature, fsa_acceptance_probability,
                             FLAGS.init_temp)
+
         # sv.start_standard_services(sess=sess)
 
         # sv.start_queue_runners()
