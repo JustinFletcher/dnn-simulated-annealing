@@ -454,7 +454,7 @@ def train_b():
     merged = tf.summary.merge_all()
 
     # Instantiate a session and initialize it.
-    sv = tf.train.Supervisor(logdir=FLAGS.log_dir, save_summaries_secs=2)
+    sv = tf.train.Supervisor(logdir=FLAGS.log_dir, save_summaries_secs=10.0)
 
     with sv.managed_session() as sess:
 
@@ -462,6 +462,9 @@ def train_b():
 
         # Start input enqueue threads.
         sv.start_queue_runners(sess=sess)
+
+        # Pause to allow the queues to fill.
+        time.sleep(10)
 
         tf_state.start(sess=sess)
         tf_perturber.start(sess=sess)
@@ -476,19 +479,16 @@ def train_b():
                                              sess.graph)
         test_writer = tf.summary.FileWriter(FLAGS.log_dir + '/test')
 
-        i = 0
         total_time = 0
         i_delta = 0
 
         # Iterate, training the model.
-        while(True):
-
-            i += 1
+        for i in range(FLAGS.max_steps):
 
             i_start = time.time()
 
-            if sv.should_stop():
-                break
+            # if sv.should_stop():
+            #     break
 
             # If we have reached a testing interval, test.
             if i % FLAGS.test_interval == 0:
@@ -540,13 +540,13 @@ if __name__ == '__main__':
                         default=False,
                         help='If true, uses fake data for unit testing.')
 
-    parser.add_argument('--max_steps', type=int, default=100000,
+    parser.add_argument('--max_steps', type=int, default=2000,
                         help='Number of steps to run trainer.')
 
     parser.add_argument('--test_interval', type=int, default=100,
                         help='Number of steps between test set evaluations.')
 
-    parser.add_argument('--learning_rate', type=float, default=0.001,
+    parser.add_argument('--learning_rate', type=float, default=1e-4,
                         help='Initial learning rate')
 
     parser.add_argument('--data_dir', type=str,
@@ -562,7 +562,7 @@ if __name__ == '__main__':
                         help='Batch size.')
 
     parser.add_argument('--num_epochs', type=int,
-                        default=10000,
+                        default=10,
                         help='Number of passes through the training set.')
 
     parser.add_argument('--train_dir', type=str,
@@ -574,7 +574,7 @@ if __name__ == '__main__':
                         help='Keep probability for output layer dropout.')
 
     parser.add_argument('--init_temp', type=float,
-                        default=10,
+                        default=1,
                         help='Initial temperature for SA algorithm')
 
     FLAGS, unparsed = parser.parse_known_args()
