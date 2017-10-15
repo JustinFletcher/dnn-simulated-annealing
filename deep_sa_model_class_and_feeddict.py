@@ -374,7 +374,7 @@ def train():
         total_time = 0
         i_delta = 0
         print("I'm updated.")
-        print('step | loss | error | t | total_time')
+        print('step | train_loss | train_error | val_loss | val_error | t | total_time')
 
         train_images, train_labels = sess.run([image_batch, label_batch])
 
@@ -393,22 +393,36 @@ def train():
             if i % FLAGS.test_interval == 0:
 
                 # Load the full dataset.
-                images, labels = mnist.test.images, mnist.test.labels
+                val_images, val_labels = mnist.test.images, mnist.test.labels
 
                 # Compute error over the test set.
-                error = sess.run(model.error,
-                                 {model.stimulus_placeholder: images,
-                                  model.target_placeholder: labels,
-                                  model.keep_prob: 1.0})
+                train_error = sess.run(model.error,
+                                       {model.stimulus_placeholder: train_images,
+                                        model.target_placeholder: train_labels,
+                                        model.keep_prob: 1.0})
 
                 # Compute error over the test set.
-                loss = sess.run(model.loss,
-                                {model.stimulus_placeholder: images,
-                                 model.target_placeholder: labels,
-                                 model.keep_prob: 1.0})
+                train_loss = sess.run(model.loss,
+                                      {model.stimulus_placeholder: train_images,
+                                       model.target_placeholder: train_labels,
+                                       model.keep_prob: 1.0})
 
-                print_tuple = (i, loss, error, i_delta, total_time)
-                print('%d | %.6f | %.2f | %.6f | %.2f' % print_tuple)
+                # Compute error over the test set.
+                val_error = sess.run(model.error,
+                                    {model.stimulus_placeholder: val_images,
+                                     model.target_placeholder: val_labels,
+                                     model.keep_prob: 1.0})
+
+                # Compute error over the test set.
+                val_loss = sess.run(model.loss,
+                                    {model.stimulus_placeholder: val_images,
+                                    model.target_placeholder: val_labels,
+                                    model.keep_prob: 1.0})
+
+                print_tuple = (i, train_loss, trian_error, val_loss,
+                               val_error, i_delta, total_time)
+
+                print('%d | %.6f | %.2f | %.6f | %.2f | %.6f | %.2f' % print_tuple)
 
             # Iterate, training the network.
             else:
@@ -490,7 +504,7 @@ if __name__ == '__main__':
                         help='Batch size.')
 
     parser.add_argument('--batch_interval', type=int,
-                        default=200,
+                        default=1000,
                         help='Batch size.')
 
     parser.add_argument('--train_dir', type=str,
