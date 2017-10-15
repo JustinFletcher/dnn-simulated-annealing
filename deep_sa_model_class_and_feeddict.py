@@ -497,10 +497,17 @@ def train():
                 # images, labels = mnist.train.next_batch(FLAGS.batch_size)
 
                 # Train the model on the batch.
-                # sess.run(model.optimize,
-                #          {model.stimulus_placeholder: images,
-                #           model.target_placeholder: labels,
-                #           model.keep_prob: 0.5})
+                if FLAGS.optimizer == 'annealer':
+                    annealer(input_data={model.stimulus_placeholder: train_images,
+                                         model.target_placeholder: train_labels,
+                                         model.keep_prob: FLAGS.keep_prob})
+                elif FLAGS.optimizer == 'sgd':
+                    sess.run(model.optimize,
+                             {model.stimulus_placeholder: images,
+                              model.target_placeholder: labels,
+                              model.keep_prob: 0.5})
+                else:
+                    break
 
                 # images, labels = mnist.train.next_batch(FLAGS.batch_size)
 
@@ -509,9 +516,6 @@ def train():
                 # #          {model.stimulus_placeholder: images,
                 # #           model.target_placeholder: labels,
                 # #           model.keep_prob: 0.5})
-                annealer(input_data={model.stimulus_placeholder: train_images,
-                                     model.target_placeholder: train_labels,
-                                     model.keep_prob: FLAGS.keep_prob})
 
                 # train_writer.add_summary(summary, i)
 
@@ -598,6 +602,10 @@ if __name__ == '__main__':
 
     parser.add_argument('--label_size', type=int,
                         default=10,
+                        help='Initial temperature for SA algorithm')
+
+    parser.add_argument('--optimizer', type=str,
+                        default='annealer',
                         help='Initial temperature for SA algorithm')
 
     FLAGS, unparsed = parser.parse_known_args()
