@@ -437,7 +437,9 @@ def train():
             else:
 
                 # Grabe a batch
-                images, labels = sess.run([image_batch, label_batch])
+                images, labels = mnist.train.next_batch(128)
+
+                # images, labels = sess.run([image_batch, label_batch])
                 # Train the model on the batch.
                 # sess.run(model.optimize,
                 #          {model.stimulus_placeholder: images,
