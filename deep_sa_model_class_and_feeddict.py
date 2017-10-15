@@ -271,7 +271,7 @@ def train():
     tf_perturber = TensorFlowPerturberFSA(FLAGS.learning_rate)
 
     # Instantiate a TensorFlow cost evaluator.
-    tf_cost_evaluator = TensorFlowCostEvaluator(model.error)
+    tf_cost_evaluator = TensorFlowCostEvaluator(model.loss)
 
     def reject(t, d):
 
@@ -396,7 +396,7 @@ if __name__ == '__main__':
     parser.add_argument('--test_interval', type=int, default=100,
                         help='Number of steps between test set evaluations.')
 
-    parser.add_argument('--learning_rate', type=float, default=1e-4,
+    parser.add_argument('--learning_rate', type=float, default=1e-1,
                         help='Initial learning rate')
 
     parser.add_argument('--data_dir', type=str,
@@ -420,7 +420,7 @@ if __name__ == '__main__':
                         help='Keep probability for output layer dropout.')
 
     parser.add_argument('--init_temp', type=float,
-                        default=20.0,
+                        default=10.0,
                         help='Initial temperature for SA algorithm')
 
     FLAGS, unparsed = parser.parse_known_args()
