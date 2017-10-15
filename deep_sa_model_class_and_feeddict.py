@@ -25,6 +25,90 @@ from tfevaluator import *
 # Constants used for dealing with the files, matches convert_to_records.
 TRAIN_FILE = 'train.tfrecords'
 VALIDATION_FILE = 'validation.tfrecords'
+IMAGE_PIXELS = 28 * 28
+
+
+def read_and_decode(filename_queue):
+
+    # Instantiate a TFRecord reader.
+    reader = tf.TFRecordReader()
+
+    # Read a single example from the input queue.
+    _, serialized_example = reader.read(filename_queue)
+
+    # Parse that example into features.
+    features = tf.parse_single_example(
+        serialized_example,
+        # Defaults are not specified since both keys are required.
+        features={
+            'image_raw': tf.FixedLenFeature([], tf.string),
+            'label': tf.FixedLenFeature([], tf.int64),
+        })
+
+    # Convert from a scalar string tensor (whose single string has
+    # length mnist.IMAGE_PIXELS) to a uint8 tensor with shape
+    # [mnist.IMAGE_PIXELS].
+    image = tf.decode_raw(features['image_raw'], tf.uint8)
+    image.set_shape([IMAGE_PIXELS])
+
+    # OPTIONAL: Could reshape into a 28x28 image and apply distortions
+    # here.  Since we are not applying any distortions in this
+    # example, and the next step expects the image to be flattened
+    # into a vector, we don't bother.
+
+    # Convert from [0, 255] -> [-0.5, 0.5] floats.
+    image = tf.cast(image, tf.float32) * (1. / 255) - 0.5
+
+    # Convert label from a scalar uint8 tensor to an int32 scalar.
+    label = tf.cast(features['label'], tf.int32)
+
+    return image, label
+
+
+def inputs(train, batch_size, num_epochs):
+    """Reads input data num_epochs times.
+    Args:
+      train: Selects between the training (True) and validation (False) data.
+      batch_size: Number of examples per returned batch.
+      num_epochs: Number of times to read the input data, or 0/None to
+                  train forever.
+    Returns:
+      A tuple (images, labels), where:
+      * images is a float tensor with shape [batch_size, mnist.IMAGE_PIXELS]
+        in the range [-0.5, 0.5].
+      * labels is an int32 tensor with shape [batch_size] with the true label,
+        a number in the range [0, mnist.NUM_CLASSES).
+    Note that an tf.train.QueueRunner is added to the graph, which
+    must be run using e.g. tf.train.start_queue_runners().
+    """
+    if not num_epochs:
+        num_epochs = None
+
+    # Set the filename pointing to the data file.
+    filename = os.path.join(FLAGS.train_dir,
+                            TRAIN_FILE if train else VALIDATION_FILE)
+
+    # Create an input scope for the graph.
+    with tf.name_scope('input'):
+
+        # Produce a queue of files to read from.
+        filename_queue = tf.train.string_input_producer([filename],
+                                                        capacity=1000)
+
+        # Even when reading in multiple threads, share the filename queue.
+        image, label = read_and_decode(filename_queue)
+
+        # Shuffle the examples and collect them into batch_size batches.
+        # (Internally uses a RandomShuffleQueue.)
+        # We run this in two threads to avoid being a bottleneck.
+        images, sparse_labels = tf.train.shuffle_batch(
+            [image, label],
+            batch_size=batch_size,
+            capacity=1000000.0 * batch_size,
+            num_threads=10,
+            min_after_dequeue=1000.0)
+
+    return images, sparse_labels
 
 
 def doublewrap(function):
@@ -262,6 +346,11 @@ def create_model():
 
 def train():
 
+    # Get input data.
+    image_batch, label_batch = inputs(train=True,
+                                      batch_size=FLAGS.batch_size,
+                                      num_epochs=FLAGS.num_epochs)
+
     model = create_model()
 
     # Instantiate a TensorFlow state object to be annealed.
@@ -346,7 +435,8 @@ def train():
             else:
 
                 # Grabe a batch
-                images, labels = mnist.train.next_batch(128)
+                # images, labels = mnist.train.next_batch(128)
+                images, labels = sess.run([image_batch, label_batch])
 
                 # Train the model on the batch.
                 # sess.run(model.optimize,
