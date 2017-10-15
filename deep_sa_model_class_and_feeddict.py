@@ -63,7 +63,7 @@ def read_and_decode(filename_queue):
 
     # Convert label from a scalar uint8 tensor to an int32 scalar.
     label_batch = features['label']
-    
+
     label = tf.one_hot(label_batch,
                        label_size,
                        on_value=1.0,
@@ -236,13 +236,6 @@ class Model:
         print_tensor_shape(self.stimulus_placeholder, 'images shape')
         print_tensor_shape(self.target_placeholder, 'label shape')
 
-
-        # resize the image tensors to add channels, 1 in this case
-        # required to pass the images to various layers upcoming in the graph
-        # images_re = tf.reshape(self.stimulus_placeholder, [-1, 28, 28, 1])
-        # print_tensor_shape(images_re, 'reshaped images shape')
-
-       
         # Fully-connected layer.
         with tf.name_scope('fully_connected1'):
 
@@ -409,9 +402,9 @@ def train():
 
                 # Compute error over the test set.
                 val_error = sess.run(model.error,
-                                    {model.stimulus_placeholder: val_images,
-                                     model.target_placeholder: val_labels,
-                                     model.keep_prob: 1.0})
+                                     {model.stimulus_placeholder: val_images,
+                                      model.target_placeholder: val_labels,
+                                      model.keep_prob: 1.0})
 
                 # Compute error over the test set.
                 val_loss = sess.run(model.loss,
@@ -435,9 +428,7 @@ def train():
                 #          {model.stimulus_placeholder: images,
                 #           model.target_placeholder: labels,
                 #           model.keep_prob: 0.5})
-                
 
-                # # Grabe a batch
                 # images, labels = mnist.train.next_batch(FLAGS.batch_size)
 
                 # # Train the model on the batch.
