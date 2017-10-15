@@ -284,7 +284,7 @@ def train():
     merged = tf.summary.merge_all()
 
     # Get input data.
-    mnist = input_data.read_data_sets(FLAGS.logdir + '/mnist/', one_hot=True)
+    mnist = input_data.read_data_sets(FLAGS.data_dir + '/mnist/', one_hot=True)
 
     # init_op = [tf.global_variables_initializer()]
 
