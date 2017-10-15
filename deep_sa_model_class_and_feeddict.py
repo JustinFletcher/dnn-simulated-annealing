@@ -60,7 +60,7 @@ def read_and_decode(filename_queue):
     image = tf.cast(image, tf.float32) * (1. / 255) - 0.5
 
     # Convert label from a scalar uint8 tensor to an int32 scalar.
-    label = tf.cast(features['label'], tf.int32)
+    label = features['label']
 
     return image, label
 
@@ -433,9 +433,9 @@ def train():
 
                 # Grabe a batch
                 images, labels = mnist.train.next_batch(128)
-                print(images)
+                print(labels)
                 images, labels = sess.run([image_batch, label_batch])
-                print(images)
+                print(labels)
                 # Train the model on the batch.
                 # sess.run(model.optimize,
                 #          {model.stimulus_placeholder: images,
