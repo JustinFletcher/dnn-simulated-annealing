@@ -503,9 +503,9 @@ def train():
                                          model.keep_prob: FLAGS.keep_prob})
                 elif FLAGS.optimizer == 'sgd':
                     sess.run(model.optimize,
-                             {model.stimulus_placeholder: images,
-                              model.target_placeholder: labels,
-                              model.keep_prob: 0.5})
+                             {model.stimulus_placeholder: train_images,
+                              model.target_placeholder: train_images,
+                              model.keep_prob: FLAGS.keep_prob})
                 else:
                     break
 
