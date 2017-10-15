@@ -416,10 +416,10 @@ def train():
                 # Compute error over the test set.
                 val_loss = sess.run(model.loss,
                                     {model.stimulus_placeholder: val_images,
-                                    model.target_placeholder: val_labels,
-                                    model.keep_prob: 1.0})
+                                     model.target_placeholder: val_labels,
+                                     model.keep_prob: 1.0})
 
-                print_tuple = (i, train_loss, trian_error, val_loss,
+                print_tuple = (i, train_loss, train_error, val_loss,
                                val_error, i_delta, total_time)
 
                 print('%d | %.6f | %.2f | %.6f | %.2f | %.6f | %.2f' % print_tuple)
