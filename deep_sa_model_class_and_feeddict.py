@@ -379,6 +379,8 @@ def main(_):
 
     train()
 
+# Instrumentation: Loss function stability by batch size.
+
 
 if __name__ == '__main__':
 
@@ -394,7 +396,7 @@ if __name__ == '__main__':
     parser.add_argument('--test_interval', type=int, default=10,
                         help='Number of steps between test set evaluations.')
 
-    parser.add_argument('--learning_rate', type=float, default=0.0,
+    parser.add_argument('--learning_rate', type=float, default=1e-10,
                         help='Initial learning rate')
 
     parser.add_argument('--data_dir', type=str,
