@@ -373,7 +373,7 @@ def train():
 
         total_time = 0
         i_delta = 0
-
+        print("I'm updated.")
         print('step | loss | error | t | total_time')
 
         for i in range(FLAGS.max_steps):
@@ -412,7 +412,7 @@ def train():
 
                 if(i % FLAGS.batch_interval == 0):
 
-                    images, labels = sess.run([image_batch, label_batch])
+                    train_images, train_labels = sess.run([image_batch, label_batch])
                 # Train the model on the batch.
                 # sess.run(model.optimize,
                 #          {model.stimulus_placeholder: images,
@@ -428,8 +428,8 @@ def train():
                 # #          {model.stimulus_placeholder: images,
                 # #           model.target_placeholder: labels,
                 # #           model.keep_prob: 0.5})
-                annealer(input_data={model.stimulus_placeholder: images,
-                                     model.target_placeholder: labels,
+                annealer(input_data={model.stimulus_placeholder: train_images,
+                                     model.target_placeholder: train_labels,
                                      model.keep_prob: 1.0})
 
                 # train_writer.add_summary(summary, i)
