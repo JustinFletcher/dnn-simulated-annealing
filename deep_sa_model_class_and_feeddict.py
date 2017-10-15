@@ -410,7 +410,9 @@ def train():
                 # Grabe a batch
                 # images, labels = mnist.train.next_batch(FLAGS.batch_size)
 
-                images, labels = sess.run([image_batch, label_batch])
+                if(i % FLAGS.batch_interval == 0):
+
+                    images, labels = sess.run([image_batch, label_batch])
                 # Train the model on the batch.
                 # sess.run(model.optimize,
                 #          {model.stimulus_placeholder: images,
@@ -481,7 +483,11 @@ if __name__ == '__main__':
                         help='Summaries log directory')
 
     parser.add_argument('--batch_size', type=int,
-                        default=64,
+                        default=512,
+                        help='Batch size.')
+
+    parser.add_argument('--batch_interval', type=int,
+                        default=200,
                         help='Batch size.')
 
     parser.add_argument('--train_dir', type=str,
