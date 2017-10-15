@@ -328,10 +328,16 @@ def train():
                 images, labels = mnist.test.images, mnist.test.labels
 
                 # Compute error over the test set.
-                error, loss = sess.run(model.error, model.loss,
-                                       feed_dict={model.stimulus_placeholder: images,
-                                                  model.target_placeholder: labels,
-                                                  model.keep_prob: 1.0})
+                error = sess.run(model.error,
+                                 {model.stimulus_placeholder: images,
+                                  model.target_placeholder: labels,
+                                  model.keep_prob: 1.0})
+
+                # Compute error over the test set.
+                loss = sess.run(model.loss,
+                                {model.stimulus_placeholder: images,
+                                 model.target_placeholder: labels,
+                                 model.keep_prob: 1.0})
 
                 print_tuple = (i, loss, error, i_delta, total_time)
                 print('%d | %.6f | %.2f | %.6f | %.2f' % print_tuple)
