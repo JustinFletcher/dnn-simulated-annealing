@@ -284,7 +284,7 @@ def train():
     merged = tf.summary.merge_all()
 
     # Get input data.
-    mnist = input_data.read_data_sets('./mnist/', one_hot=True)
+    mnist = input_data.read_data_sets(FLAGS.logdir + '/mnist/', one_hot=True)
 
     # init_op = [tf.global_variables_initializer()]
 
@@ -341,13 +341,13 @@ def train():
                 images, labels = mnist.train.next_batch(FLAGS.batch_size)
 
                 # Train the model on the batch.
-                sess.run(model.optimize,
-                         {model.stimulus_placeholder: images,
-                          model.target_placeholder: labels,
-                          model.keep_prob: 0.5})
-                # annealer(data={model.stimulus_placeholder: images,
-                #                model.target_placeholder: labels,
-                #                model.keep_prob: 1.0})
+                # sess.run(model.optimize,
+                #          {model.stimulus_placeholder: images,
+                #           model.target_placeholder: labels,
+                #           model.keep_prob: 0.5})
+                annealer(data={model.stimulus_placeholder: images,
+                               model.target_placeholder: labels,
+                               model.keep_prob: 1.0})
 
                 # train_writer.add_summary(summary, i)
 
