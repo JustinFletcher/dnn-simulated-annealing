@@ -65,7 +65,7 @@ def read_and_decode(filename_queue):
     return image, label
 
 
-def inputs(train, batch_size, num_epochs):
+def inputs(train, batch_size):
     """Reads input data num_epochs times.
     Args:
       train: Selects between the training (True) and validation (False) data.
@@ -81,8 +81,6 @@ def inputs(train, batch_size, num_epochs):
     Note that an tf.train.QueueRunner is added to the graph, which
     must be run using e.g. tf.train.start_queue_runners().
     """
-    if not num_epochs:
-        num_epochs = None
 
     # Set the filename pointing to the data file.
     filename = os.path.join(FLAGS.train_dir,
@@ -93,7 +91,7 @@ def inputs(train, batch_size, num_epochs):
 
         # Produce a queue of files to read from.
         filename_queue = tf.train.string_input_producer([filename],
-                                                        capacity=1000)
+                                                        capacity=1)
 
         # Even when reading in multiple threads, share the filename queue.
         image, label = read_and_decode(filename_queue)
@@ -104,9 +102,9 @@ def inputs(train, batch_size, num_epochs):
         images, sparse_labels = tf.train.shuffle_batch(
             [image, label],
             batch_size=batch_size,
-            capacity=1000000.0 * batch_size,
-            num_threads=10,
-            min_after_dequeue=1000.0)
+            capacity=10000.0,
+            num_threads=64,
+            min_after_dequeue=100.0)
 
     return images, sparse_labels
 
@@ -348,8 +346,7 @@ def train():
 
     # Get input data.
     image_batch, label_batch = inputs(train=True,
-                                      batch_size=FLAGS.batch_size,
-                                      num_epochs=FLAGS.num_epochs)
+                                      batch_size=FLAGS.batch_size)
 
     model = create_model()
 
