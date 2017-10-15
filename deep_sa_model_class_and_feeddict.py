@@ -312,6 +312,8 @@ def train():
         total_time = 0
         i_delta = 0
 
+        print('step | loss | error | t | total_time')
+
         for i in range(FLAGS.max_steps):
 
             i_start = time.time()
@@ -326,13 +328,13 @@ def train():
                 images, labels = mnist.test.images, mnist.test.labels
 
                 # Compute error over the test set.
-                error = sess.run(model.error,
-                                 {model.stimulus_placeholder: images,
-                                  model.target_placeholder: labels,
-                                  model.keep_prob: 1.0})
+                error, loss = sess.run(model.error, model.loss,
+                                       {model.stimulus_placeholder: images,
+                                        model.target_placeholder: labels,
+                                        model.keep_prob: 1.0})
 
-                # print('Test error @' + str(i) + ': {:6.2f}%'.format(100 * error))
-                print('Step %d:  error = %.2f, t = %.6f, total_t = %.2f, ' % (i, error, i_delta, total_time))
+                print_tuple = (i, loss, error, i_delta, total_time)
+                print('%d | %.6f | %.2f | %.6f | %.2f, ' % print_tuple)
 
             # Iterate, training the network.
             else:
