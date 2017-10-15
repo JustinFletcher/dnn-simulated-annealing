@@ -25,7 +25,9 @@ from tfevaluator import *
 # Constants used for dealing with the files, matches convert_to_records.
 TRAIN_FILE = 'train.tfrecords'
 VALIDATION_FILE = 'validation.tfrecords'
-IMAGE_PIXELS = 28 * 28
+input_size = 28 * 28
+label_size = 10
+hl_size = 512
 
 
 def read_and_decode(filename_queue):
@@ -49,7 +51,7 @@ def read_and_decode(filename_queue):
     # length mnist.IMAGE_PIXELS) to a uint8 tensor with shape
     # [mnist.IMAGE_PIXELS].
     image = tf.decode_raw(features['image_raw'], tf.uint8)
-    image.set_shape([IMAGE_PIXELS])
+    image.set_shape([input_size])
 
     # OPTIONAL: Could reshape into a 28x28 image and apply distortions
     # here.  Since we are not applying any distortions in this
@@ -63,7 +65,7 @@ def read_and_decode(filename_queue):
     label_batch = features['label']
     
     label = tf.one_hot(label_batch,
-                       10,
+                       label_size,
                        on_value=1.0,
                        off_value=0.0)
 
@@ -234,6 +236,7 @@ class Model:
         print_tensor_shape(self.stimulus_placeholder, 'images shape')
         print_tensor_shape(self.target_placeholder, 'label shape')
 
+
         # resize the image tensors to add channels, 1 in this case
         # required to pass the images to various layers upcoming in the graph
         # images_re = tf.reshape(self.stimulus_placeholder, [-1, 28, 28, 1])
@@ -243,8 +246,8 @@ class Model:
         # Fully-connected layer.
         with tf.name_scope('fully_connected1'):
 
-            W_fc1 = self.weight_variable([28 * 28, 1024])
-            b_fc1 = self.bias_variable([1024])
+            W_fc1 = self.weight_variable([input_size, hl_size])
+            b_fc1 = self.bias_variable([hl_size])
 
             h_fc1 = tf.nn.relu(tf.matmul(self.stimulus_placeholder, W_fc1) + b_fc1)
             print_tensor_shape(h_fc1, 'FullyConnected1 shape')
@@ -257,8 +260,8 @@ class Model:
         # Output layer (will be transformed via stable softmax)
         with tf.name_scope('readout'):
 
-            W_fc2 = self.weight_variable([1024, 10])
-            b_fc2 = self.bias_variable([10])
+            W_fc2 = self.weight_variable([hl_size, label_size])
+            b_fc2 = self.bias_variable([label_size])
 
             readout = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
             print_tensor_shape(readout, 'readout shape')
