@@ -104,7 +104,7 @@ def inputs(train, batch_size):
             batch_size=batch_size,
             capacity=10000.0,
             num_threads=64,
-            min_after_dequeue=100p)
+            min_after_dequeue=100)
 
     return images, sparse_labels
 
