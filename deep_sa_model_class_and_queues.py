@@ -91,7 +91,7 @@ def inputs(train, batch_size, num_epochs):
 
         # Produce a queue of files to read from.
         filename_queue = tf.train.string_input_producer([filename],
-                                                        capacity=1000)
+                                                        capacity=1)
 
         # Even when reading in multiple threads, share the filename queue.
         image, label = read_and_decode(filename_queue)
@@ -102,8 +102,8 @@ def inputs(train, batch_size, num_epochs):
         images, sparse_labels = tf.train.shuffle_batch(
             [image, label],
             batch_size=batch_size,
-            capacity=1000000.0 * batch_size,
-            num_threads=15,
+            capacity=1000000.0,
+            num_threads=64,
             min_after_dequeue=1)
 
     return images, sparse_labels
@@ -558,7 +558,7 @@ if __name__ == '__main__':
                         help='Summaries log directory')
 
     parser.add_argument('--batch_size', type=int,
-                        default=32,
+                        default=64,
                         help='Batch size.')
 
     parser.add_argument('--num_epochs', type=int,
