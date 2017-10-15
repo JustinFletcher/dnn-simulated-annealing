@@ -394,7 +394,7 @@ if __name__ == '__main__':
     parser.add_argument('--test_interval', type=int, default=10,
                         help='Number of steps between test set evaluations.')
 
-    parser.add_argument('--learning_rate', type=float, default=0.01,
+    parser.add_argument('--learning_rate', type=float, default=1e-9,
                         help='Initial learning rate')
 
     parser.add_argument('--data_dir', type=str,
@@ -422,7 +422,7 @@ if __name__ == '__main__':
                         help='Keep probability for output layer dropout.')
 
     parser.add_argument('--init_temp', type=float,
-                        default=1,
+                        default=1.0,
                         help='Initial temperature for SA algorithm')
 
     FLAGS, unparsed = parser.parse_known_args()
