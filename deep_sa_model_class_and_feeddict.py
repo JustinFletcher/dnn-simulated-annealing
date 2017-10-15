@@ -450,6 +450,10 @@ def train():
 
                 train_images, train_labels = sess.run([image_batch, label_batch])
 
+            if(i % FLAGS.reanneal_interval == 0):
+
+                annealer.reanneal()
+
             # If we have reached a testing interval, test.
             if i % FLAGS.test_interval == 0:
 
@@ -564,6 +568,10 @@ if __name__ == '__main__':
                         help='Batch size.')
 
     parser.add_argument('--batch_interval', type=int,
+                        default=1000,
+                        help='Batch size.')
+
+    parser.add_argument('--reanneal_interval', type=int,
                         default=1000,
                         help='Batch size.')
 
