@@ -25,9 +25,6 @@ from tfevaluator import *
 # Constants used for dealing with the files, matches convert_to_records.
 TRAIN_FILE = 'train.tfrecords'
 VALIDATION_FILE = 'validation.tfrecords'
-input_size = 28 * 28
-label_size = 10
-hl_size = 512
 
 
 def read_and_decode(filename_queue):
@@ -51,7 +48,7 @@ def read_and_decode(filename_queue):
     # length mnist.IMAGE_PIXELS) to a uint8 tensor with shape
     # [mnist.IMAGE_PIXELS].
     image = tf.decode_raw(features['image_raw'], tf.uint8)
-    image.set_shape([input_size])
+    image.set_shape([FLAGS.input_size])
 
     # OPTIONAL: Could reshape into a 28x28 image and apply distortions
     # here.  Since we are not applying any distortions in this
@@ -65,7 +62,7 @@ def read_and_decode(filename_queue):
     label_batch = features['label']
 
     label = tf.one_hot(label_batch,
-                       label_size,
+                       FLAGS.label_size,
                        on_value=1.0,
                        off_value=0.0)
 
@@ -174,12 +171,12 @@ class Model:
 
         self.stimulus_placeholder = stimulus_placeholder
         self.target_placeholder = target_placeholder
+        self.keep_prob = keep_prob
         self.learning_rate = FLAGS.learning_rate
         self.inference
         self.loss
         self.optimize
         self.error
-        self.keep_prob = keep_prob
 
     def variable_summaries(self, var):
             """Attach a lot of summaries to a Tensor
@@ -239,8 +236,8 @@ class Model:
         # Fully-connected layer.
         with tf.name_scope('fully_connected1'):
 
-            W_fc1 = self.weight_variable([input_size, hl_size])
-            b_fc1 = self.bias_variable([hl_size])
+            W_fc1 = self.weight_variable([FLAGS.input_size, FLAGS.hl_size])
+            b_fc1 = self.bias_variable([FLAGS.hl_size])
 
             h_fc1 = tf.nn.relu(tf.matmul(self.stimulus_placeholder, W_fc1) + b_fc1)
             print_tensor_shape(h_fc1, 'FullyConnected1 shape')
@@ -248,13 +245,13 @@ class Model:
         # Dropout layer.
         with tf.name_scope('dropout'):
 
-            h_fc1_drop = tf.nn.dropout(h_fc1, FLAGS.keep_prob)
+            h_fc1_drop = tf.nn.dropout(h_fc1, self.keep_prob)
 
         # Output layer (will be transformed via stable softmax)
         with tf.name_scope('readout'):
 
-            W_fc2 = self.weight_variable([hl_size, label_size])
-            b_fc2 = self.bias_variable([label_size])
+            W_fc2 = self.weight_variable([FLAGS.hl_size, FLAGS.label_size])
+            b_fc2 = self.bias_variable([FLAGS.label_size])
 
             readout = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
             print_tensor_shape(readout, 'readout shape')
@@ -448,9 +445,13 @@ def train():
 
             if(i % FLAGS.batch_interval == 0):
 
+                print('New Batch!')
+
                 train_images, train_labels = sess.run([image_batch, label_batch])
 
             if(i % FLAGS.reanneal_interval == 0):
+
+                print('Reannealing!')
 
                 annealer.reanneal()
 
@@ -510,7 +511,7 @@ def train():
                 # #           model.keep_prob: 0.5})
                 annealer(input_data={model.stimulus_placeholder: train_images,
                                      model.target_placeholder: train_labels,
-                                     model.keep_prob: 1.0})
+                                     model.keep_prob: FLAGS.keep_prob})
 
                 # train_writer.add_summary(summary, i)
 
@@ -579,12 +580,24 @@ if __name__ == '__main__':
                         default='../data',
                         help='Directory with the training data.')
 
+    parser.add_argument('--hl_size', type=int,
+                        default=512,
+                        help='Directory with the training data.')
+
     parser.add_argument('--keep_prob', type=float,
                         default=1.0,
                         help='Keep probability for output layer dropout.')
 
     parser.add_argument('--init_temp', type=float,
                         default=10.0,
+                        help='Initial temperature for SA algorithm')
+
+    parser.add_argument('--input_size', type=int,
+                        default=28 * 28,
+                        help='Initial temperature for SA algorithm')
+
+    parser.add_argument('--label_size', type=int,
+                        default=10,
                         help='Initial temperature for SA algorithm')
 
     FLAGS, unparsed = parser.parse_known_args()
