@@ -431,7 +431,7 @@ def train():
 
         total_time = 0
         i_delta = 0
-        print("I'm updated.")
+
         print('step | train_loss | train_error | val_loss | val_error | t | total_time')
 
         train_images, train_labels = sess.run([image_batch, label_batch])
@@ -445,13 +445,13 @@ def train():
 
             if(i % FLAGS.batch_interval == 0):
 
-                print('New Batch!')
+                # print('New Batch!')
 
                 train_images, train_labels = sess.run([image_batch, label_batch])
 
             if(i % FLAGS.reanneal_interval == 0):
 
-                print('Reannealing!')
+                # print('Reannealing!')
 
                 annealer.reanneal()
 
