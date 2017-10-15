@@ -376,6 +376,8 @@ def train():
         print("I'm updated.")
         print('step | loss | error | t | total_time')
 
+        train_images, train_labels = sess.run([image_batch, label_batch])
+
         for i in range(FLAGS.max_steps):
 
             i_start = time.time()
