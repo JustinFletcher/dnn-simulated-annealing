@@ -345,9 +345,9 @@ def train():
                 #          {model.stimulus_placeholder: images,
                 #           model.target_placeholder: labels,
                 #           model.keep_prob: 0.5})
-                annealer(data={model.stimulus_placeholder: images,
-                               model.target_placeholder: labels,
-                               model.keep_prob: 1.0})
+                annealer(input_data={model.stimulus_placeholder: images,
+                                     model.target_placeholder: labels,
+                                     model.keep_prob: 1.0})
 
                 # train_writer.add_summary(summary, i)
 
