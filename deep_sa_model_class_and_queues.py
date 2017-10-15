@@ -102,7 +102,7 @@ def inputs(train, batch_size, num_epochs):
         images, sparse_labels = tf.train.shuffle_batch(
             [image, label],
             batch_size=batch_size,
-            capacity=1000000.0,
+            capacity=10000.0,
             num_threads=64,
             min_after_dequeue=1)
 
@@ -494,8 +494,7 @@ def train_b():
             if i % FLAGS.test_interval == 0:
 
                 # Compute loss over the test set.
-                summary, error, loss = sess.run([model.error,
-                                                 model.loss])
+                summary, error, loss = sess.run([model.error, model.loss])
                 print('Step %d: loss = %.2f, error = %.2f, t = %.2f, t_total = %.2f, ' % (i, loss, error, i_delta, total_time))
 
                 # test_writer.add_summary(summary, i)
@@ -506,7 +505,7 @@ def train_b():
 
                 # Train the model on the batch.
                 annealer()
-                summary = sess.run(merged)
+                # summary = sess.run(merged)
                 # train_writer.add_summary(summary, i)
 
             i_stop = time.time()
