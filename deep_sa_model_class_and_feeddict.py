@@ -351,7 +351,7 @@ def train():
 
     # Get input data.
     image_batch, label_batch = inputs(train=True,
-                                      batch_size=FLAGS.batch_size):
+                                      batch_size=FLAGS.batch_size)
 
     model = create_model()
 
