@@ -351,7 +351,7 @@ def train():
 
     # Get input data.
     image_batch, label_batch = inputs(train=True,
-                                      batch_size=FLAGS.batch_size)
+                                      batch_size=FLAGS.batch_size):
 
     model = create_model()
 
@@ -437,10 +437,7 @@ def train():
             else:
 
                 # Grabe a batch
-                images, labels = mnist.train.next_batch(128)
-                print(labels)
                 images, labels = sess.run([image_batch, label_batch])
-                print(labels)
                 # Train the model on the batch.
                 # sess.run(model.optimize,
                 #          {model.stimulus_placeholder: images,
