@@ -491,7 +491,7 @@ if __name__ == '__main__':
                         help='Summaries log directory')
 
     parser.add_argument('--batch_size', type=int,
-                        default=512,
+                        default=1024,
                         help='Batch size.')
 
     parser.add_argument('--batch_interval', type=int,
@@ -507,7 +507,7 @@ if __name__ == '__main__':
                         help='Keep probability for output layer dropout.')
 
     parser.add_argument('--init_temp', type=float,
-                        default=1.0,
+                        default=10.0,
                         help='Initial temperature for SA algorithm')
 
     FLAGS, unparsed = parser.parse_known_args()
