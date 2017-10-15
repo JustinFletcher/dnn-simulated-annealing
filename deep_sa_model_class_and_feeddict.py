@@ -346,6 +346,20 @@ def train():
             else:
 
                 # Grabe a batch
+                images, labels = mnist.train.next_batch(128)
+
+                # Train the model on the batch.
+                # sess.run(model.optimize,
+                #          {model.stimulus_placeholder: images,
+                #           model.target_placeholder: labels,
+                #           model.keep_prob: 0.5})
+                # Compute error over the test set.
+                loss = sess.run(model.optimize,
+                                {model.stimulus_placeholder: images,
+                                 model.target_placeholder: labels,
+                                 model.keep_prob: 1.0})
+
+                # Grabe a batch
                 images, labels = mnist.train.next_batch(FLAGS.batch_size)
 
                 # Train the model on the batch.
