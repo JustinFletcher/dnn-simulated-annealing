@@ -396,7 +396,7 @@ if __name__ == '__main__':
     parser.add_argument('--test_interval', type=int, default=100,
                         help='Number of steps between test set evaluations.')
 
-    parser.add_argument('--learning_rate', type=float, default=1e-4,
+    parser.add_argument('--learning_rate', type=float, default=1e-2,
                         help='Initial learning rate')
 
     parser.add_argument('--data_dir', type=str,
@@ -408,7 +408,7 @@ if __name__ == '__main__':
                         help='Summaries log directory')
 
     parser.add_argument('--batch_size', type=int,
-                        default=2**16,
+                        default=2**15,
                         help='Batch size.')
 
     parser.add_argument('--train_dir', type=str,
