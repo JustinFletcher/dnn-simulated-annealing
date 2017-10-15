@@ -268,7 +268,7 @@ def train():
     tf_state = TensorFlowState()
 
     # Instantiate a TensorFlow state perturber.
-    tf_perturber = TensorFlowPerturberFSA(FLAGS.learning_rate)
+    tf_perturber = TensorFlowPerturberCSA(FLAGS.learning_rate)
 
     # Instantiate a TensorFlow cost evaluator.
     tf_cost_evaluator = TensorFlowCostEvaluator(model.loss)
@@ -394,7 +394,7 @@ if __name__ == '__main__':
     parser.add_argument('--test_interval', type=int, default=10,
                         help='Number of steps between test set evaluations.')
 
-    parser.add_argument('--learning_rate', type=float, default=1e-9,
+    parser.add_argument('--learning_rate', type=float, default=1e-12,
                         help='Initial learning rate')
 
     parser.add_argument('--data_dir', type=str,
