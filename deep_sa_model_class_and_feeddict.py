@@ -390,10 +390,10 @@ if __name__ == '__main__':
                         default=False,
                         help='If true, uses fake data for unit testing.')
 
-    parser.add_argument('--max_steps', type=int, default=100,
+    parser.add_argument('--max_steps', type=int, default=1000,
                         help='Number of steps to run trainer.')
 
-    parser.add_argument('--test_interval', type=int, default=10,
+    parser.add_argument('--test_interval', type=int, default=100,
                         help='Number of steps between test set evaluations.')
 
     parser.add_argument('--learning_rate', type=float, default=1e-4,
@@ -411,10 +411,6 @@ if __name__ == '__main__':
                         default=2**16,
                         help='Batch size.')
 
-    parser.add_argument('--num_epochs', type=int,
-                        default=100,
-                        help='Number of passes through the training set.')
-
     parser.add_argument('--train_dir', type=str,
                         default='../data',
                         help='Directory with the training data.')
@@ -424,7 +420,7 @@ if __name__ == '__main__':
                         help='Keep probability for output layer dropout.')
 
     parser.add_argument('--init_temp', type=float,
-                        default=1.0,
+                        default=20.0,
                         help='Initial temperature for SA algorithm')
 
     FLAGS, unparsed = parser.parse_known_args()
