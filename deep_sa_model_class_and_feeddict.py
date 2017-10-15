@@ -268,7 +268,7 @@ def train():
     tf_state = TensorFlowState()
 
     # Instantiate a TensorFlow state perturber.
-    tf_perturber = TensorFlowPerturberCSA(FLAGS.learning_rate)
+    tf_perturber = TensorFlowPerturberFSA(FLAGS.learning_rate)
 
     # Instantiate a TensorFlow cost evaluator.
     tf_cost_evaluator = TensorFlowCostEvaluator(model.loss)
