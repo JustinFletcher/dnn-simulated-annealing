@@ -391,7 +391,7 @@ def train():
     tf_perturber = TensorFlowPerturberFSA(FLAGS.learning_rate)
 
     # Instantiate a TensorFlow cost evaluator.
-    tf_cost_evaluator = TensorFlowCostEvaluator(model.loss)
+    tf_cost_evaluator = TensorFlowCostEvaluator(model.error)
 
     def reject(t, d):
 
