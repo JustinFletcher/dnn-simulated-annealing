@@ -385,6 +385,10 @@ def train():
             if sv.should_stop():
                 break
 
+            if(i % FLAGS.batch_interval == 0):
+
+                train_images, train_labels = sess.run([image_batch, label_batch])
+
             # If we have reached a testing interval, test.
             if i % FLAGS.test_interval == 0:
 
@@ -412,9 +416,6 @@ def train():
                 # Grabe a batch
                 # images, labels = mnist.train.next_batch(FLAGS.batch_size)
 
-                if(i % FLAGS.batch_interval == 0):
-
-                    train_images, train_labels = sess.run([image_batch, label_batch])
                 # Train the model on the batch.
                 # sess.run(model.optimize,
                 #          {model.stimulus_placeholder: images,
