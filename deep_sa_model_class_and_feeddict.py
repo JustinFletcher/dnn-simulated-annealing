@@ -60,7 +60,7 @@ def read_and_decode(filename_queue):
     image = tf.cast(image, tf.float32) * (1. / 255) - 0.5
 
     # Convert label from a scalar uint8 tensor to an int32 scalar.
-    label = tf.decode_raw(features['label'], tf.uint8)
+    label = features['label']
     label.set_shape([10])
 
     return image, label
