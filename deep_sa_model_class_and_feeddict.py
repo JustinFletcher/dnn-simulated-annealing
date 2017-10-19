@@ -391,7 +391,7 @@ def train():
     tf_perturber = TensorFlowPerturberFSA(FLAGS.learning_rate)
 
     # Instantiate a TensorFlow cost evaluator.
-    tf_cost_evaluator = TensorFlowCostEvaluator(model.error)
+    tf_cost_evaluator = TensorFlowCostEvaluator(model.loss)
 
     def reject(t, d):
 
@@ -403,14 +403,10 @@ def train():
 
     merged = tf.summary.merge_all()
 
-    # Get input data.
-    mnist = input_data.read_data_sets(FLAGS.data_dir + '/mnist/', one_hot=True)
-
     # init_op = [tf.global_variables_initializer()]
 
     # Instantiate a session and initialize it.
     sv = tf.train.Supervisor(logdir=FLAGS.log_dir, save_summaries_secs=10.0)
-    # sess = sv.managed_session()
 
     with sv.managed_session() as sess:
 
