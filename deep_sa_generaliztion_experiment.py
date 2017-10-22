@@ -2,6 +2,7 @@
 
 import os
 import sys
+import csv
 import time
 import argparse
 import functools
@@ -419,7 +420,24 @@ def create_model():
     return(model)
 
 
-def train():
+def run_experiment(batch_size, hl_size, optimizer):
+
+    # Reset the default graph.
+    tf.reset_default_graph()
+
+    print('-------------------------------------------------------')
+    print('batch_size = %d | hl_size = %d' % (batch_size, hl_size))
+    print('-------------------------------------------------------')
+
+    # Overwrite flag defualt for this experiment
+    FLAGS.batch_size = batch_size
+    FLAGS.hl_size = hl_size
+    FLAGS.optimizer = optimizer
+
+    # Declare experimental measurement vars.
+    steps = []
+    val_losses = []
+    train_losses = []
 
     # Get input data.
     image_batch, label_batch = inputs(train=True,
@@ -465,31 +483,39 @@ def train():
                             fsa_temperature, fsa_acceptance_probability,
                             FLAGS.init_temp)
 
+        # Declare timekeeping vars.
         total_time = 0
         i_delta = 0
 
+
+
+        # Print a line for debug.
         print('step | train_loss | train_error | val_loss | val_error | t | total_time')
 
+        # Grab an inital batch by running the batch ops.
         train_images, train_labels = sess.run([image_batch, label_batch])
 
+        # Iterate until max steps.
         for i in range(FLAGS.max_steps):
 
+            # Hack the start time.
             i_start = time.time()
 
+            # Check for break.
             if sv.should_stop():
                 break
 
+            # Check for batch interval.
             if(i % FLAGS.batch_interval == 0):
 
-                # print('New Batch!')
-
+                # Update the batch.
                 train_images, train_labels = sess.run([image_batch,
                                                        label_batch])
 
+            # Check for reannealing
             if(i % FLAGS.reanneal_interval == 0):
 
-                # print('Reannealing!')
-
+                # Reanneal the model.
                 annealer.reanneal()
 
             # If we have reached a testing interval, test.
@@ -518,6 +544,10 @@ def train():
 
                 # Compute error over the test set.
                 val_loss = sess.run(model.loss, val_dict)
+
+                steps.append(i)
+                train_losses.append(train_loss)
+                val_losses.append(val_loss)
 
                 print_tuple = (i, train_loss, train_error, val_loss,
                                val_error, i_delta, total_time)
@@ -557,6 +587,12 @@ def train():
         # test_writer.close()
         # train_writer.close()
         sv.stop()
+        sess.close()
+
+    return([steps, train_losses, val_losses])
+
+# Experimental dimensions: batch_size=64..512, hl_size=8..1024, optimizer=['annealer', 'sgd']
+# Responses: train_error, val_error, information_plane_graph
 
 
 def main(_):
@@ -567,7 +603,53 @@ def main(_):
 
     tf.gfile.MakeDirs(FLAGS.log_dir)
 
-    train()
+    outputs = []
+
+    optimizers = ['annealer', 'sgd']
+
+    batch_sizes = [128]
+
+    hl_sizes = [16]
+
+    for optimizer in optimizers:
+
+        for batch_size in batch_sizes:
+
+            for hl_size in hl_sizes:
+
+                output = run_experiment(batch_size, hl_size, optimizer)
+
+                outputs.append([optimizer, batch_size, hl_size, output])
+
+    with open(FLAGS.log_dir + '/sa_generalization_out.csv', 'w') as csvfile:
+
+        csvwriter = csv.writer(csvfile)
+
+        csvwriter.writerow(['optimizer',
+                            'batch_size',
+                            'hl_size',
+                            'step_num',
+                            'train_loss',
+                            'val_loss'])
+
+        for o in outputs:
+
+            optimizer, batch_size, hl_size, measurements = o
+
+            steps = measurements[0]
+            train_losses = measurements[1]
+            val_losses = measurements[2]
+
+            for step, tl, vl in zip(steps,
+                                    train_losses,
+                                    val_losses):
+
+                csvwriter.writerow([optimizer,
+                                    batch_size,
+                                    hl_size,
+                                    step,
+                                    tl,
+                                    vl])
 
 # Instrumentation: Loss function stability by batch size.
 # Instrumentation: Loss function stability by batch size.
@@ -581,7 +663,7 @@ if __name__ == '__main__':
                         default=False,
                         help='If true, uses fake data for unit testing.')
 
-    parser.add_argument('--max_steps', type=int, default=10000,
+    parser.add_argument('--max_steps', type=int, default=100,
                         help='Number of steps to run trainer.')
 
     parser.add_argument('--test_interval', type=int, default=100,
