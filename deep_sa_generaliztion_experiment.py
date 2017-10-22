@@ -607,9 +607,9 @@ def main(_):
 
     optimizers = ['annealer', 'sgd']
 
-    batch_sizes = [128]
+    batch_sizes = [128, 256, 512, 1024]
 
-    hl_sizes = [16]
+    hl_sizes = [8, 16, 32]
 
     for optimizer in optimizers:
 
@@ -621,7 +621,10 @@ def main(_):
 
                 outputs.append([optimizer, batch_size, hl_size, output])
 
-    with open(FLAGS.log_dir + '/sa_generalization_out.csv', 'w') as csvfile:
+    # with open(FLAGS.log_dir + '/sa_generalization_out.csv', 'w') as csvfile:
+
+    # Accomodate Python 2.7 on Hokulea.
+    with open(FLAGS.log_dir + '/sa_generalization_out.csv', 'wb') as csvfile:
 
         csvwriter = csv.writer(csvfile)
 
@@ -639,6 +642,8 @@ def main(_):
             steps = measurements[0]
             train_losses = measurements[1]
             val_losses = measurements[2]
+
+            print('entering step loop')
 
             for step, tl, vl in zip(steps,
                                     train_losses,
@@ -663,7 +668,7 @@ if __name__ == '__main__':
                         default=False,
                         help='If true, uses fake data for unit testing.')
 
-    parser.add_argument('--max_steps', type=int, default=100,
+    parser.add_argument('--max_steps', type=int, default=10000,
                         help='Number of steps to run trainer.')
 
     parser.add_argument('--test_interval', type=int, default=100,
@@ -685,11 +690,11 @@ if __name__ == '__main__':
                         help='Batch size.')
 
     parser.add_argument('--batch_interval', type=int,
-                        default=10000,
+                        default=100000,
                         help='Batch size.')
 
     parser.add_argument('--reanneal_interval', type=int,
-                        default=10000,
+                        default=100000,
                         help='Batch size.')
 
     parser.add_argument('--train_dir', type=str,
