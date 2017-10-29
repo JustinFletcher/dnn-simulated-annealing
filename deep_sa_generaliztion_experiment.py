@@ -609,7 +609,7 @@ def main(_):
 
     batch_sizes = [128, 2048, 16384]
 
-    hl_sizes = [16, 16, 16, 16]
+    hl_sizes = [16, 16, 16]
 
     for optimizer in optimizers:
 
