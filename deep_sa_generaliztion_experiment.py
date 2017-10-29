@@ -607,9 +607,9 @@ def main(_):
 
     optimizers = ['annealer', 'sgd']
 
-    batch_sizes = [128, 2048, 16384, 32768]
+    batch_sizes = [128, 2048, 16384]
 
-    hl_sizes = [16, 16]
+    hl_sizes = [16, 16, 16, 16]
 
     for optimizer in optimizers:
 
@@ -668,7 +668,7 @@ if __name__ == '__main__':
                         default=False,
                         help='If true, uses fake data for unit testing.')
 
-    parser.add_argument('--max_steps', type=int, default=10000,
+    parser.add_argument('--max_steps', type=int, default=50000,
                         help='Number of steps to run trainer.')
 
     parser.add_argument('--test_interval', type=int, default=100,
@@ -690,11 +690,11 @@ if __name__ == '__main__':
                         help='Batch size.')
 
     parser.add_argument('--batch_interval', type=int,
-                        default=100000,
+                        default=500000,
                         help='Batch size.')
 
     parser.add_argument('--reanneal_interval', type=int,
-                        default=100000,
+                        default=500000,
                         help='Batch size.')
 
     parser.add_argument('--train_dir', type=str,
