@@ -78,9 +78,9 @@ for i, bs in enumerate(df.batch_size.unique()):
 
         pad = -70
         ax.annotate(str(bs), xy=(0, 0.75), xytext=(pad, 0),
-                     rotation=90,
-                     xycoords='axes fraction', textcoords='offset points',
-                     size='large', ha='center', va='baseline')
+                    rotation=90,
+                    xycoords='axes fraction', textcoords='offset points',
+                    size='large', ha='center', va='baseline')
 
 plt.suptitle("TensorFlow Queue Exhaustion on Hokule'a")
 
