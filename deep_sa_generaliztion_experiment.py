@@ -410,8 +410,8 @@ class Model:
 def create_model():
 
     # Build placeholders for the input and desired response.
-    stimulus_placeholder = tf.placeholder(tf.float32, [None, 784])
-    target_placeholder = tf.placeholder(tf.int32, [None, 10])
+    stimulus_placeholder = tf.placeholder(tf.float32, [None, FLAGS.input_size])
+    target_placeholder = tf.placeholder(tf.int32, [None, FLAGS.label_size])
     keep_prob = tf.placeholder(tf.float32)
 
     # Instantiate a model.
@@ -609,7 +609,7 @@ def main(_):
 
     batch_sizes = [128, 256, 512, 1024]
 
-    hl_sizes = [8, 16, 32]
+    hl_sizes = [16, 16]
 
     for optimizer in optimizers:
 
@@ -621,6 +621,7 @@ def main(_):
 
                 outputs.append([optimizer, batch_size, hl_size, output])
 
+    # Accomodate Python 3+
     # with open(FLAGS.log_dir + '/sa_generalization_out.csv', 'w') as csvfile:
 
     # Accomodate Python 2.7 on Hokulea.
