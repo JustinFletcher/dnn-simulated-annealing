@@ -607,7 +607,7 @@ def main(_):
 
     optimizers = ['annealer', 'sgd']
 
-    batch_sizes = [128, 256, 512, 1024]
+    batch_sizes = [128, 2048, 16384, 32768]
 
     hl_sizes = [16, 16]
 
@@ -657,7 +657,6 @@ def main(_):
                                     tl,
                                     vl])
 
-# Instrumentation: Loss function stability by batch size.
 # Instrumentation: Loss function stability by batch size.
 
 
