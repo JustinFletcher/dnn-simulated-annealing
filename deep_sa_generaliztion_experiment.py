@@ -289,10 +289,6 @@ if __name__ == '__main__':
                         default=10000,
                         help='Validation set batch size.')
 
-    parser.add_argument('--keep_prob', type=float,
-                        default=1.0,
-                        help='Keep probability for output layer dropout.')
-
     parser.add_argument('--input_size', type=int,
                         default=28 * 28,
                         help='Dimensionality of the input space.')
