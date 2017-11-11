@@ -196,9 +196,9 @@ def main(_):
     experimental_outputs = []
 
     # Establish the dependent variables of the experiment.
-    reps = range(2)
+    reps = range(10)
     optimizers = ['annealer', 'sgd']
-    batch_sizes = [128, 256, 512, 1024, 2048, 4096, 8192]
+    batch_sizes = [128, 256, 512, 1024, 2048, 4096, 8192, 16384]
 
     # Produce the Cartesian set of configurations.
     experimental_configurations = itertools.product(optimizers,
@@ -268,7 +268,7 @@ if __name__ == '__main__':
 
     # Establish default arguements.
 
-    parser.add_argument('--max_steps', type=int, default=50000,
+    parser.add_argument('--max_steps', type=int, default=100000,
                         help='Number of steps to run trainer.')
 
     parser.add_argument('--test_interval', type=int, default=100,
@@ -314,7 +314,7 @@ if __name__ == '__main__':
                         help='Number of threads to enqueue val examples.')
 
     parser.add_argument('--thread_count', type=int,
-                        default=32,
+                        default=128,
                         help='Number of threads to enqueue training examples.')
 
     parser.add_argument('--batch_size', type=int,
