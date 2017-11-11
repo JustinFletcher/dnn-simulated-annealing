@@ -5,6 +5,7 @@ import sys
 import csv
 import time
 import argparse
+import itertools
 import functools
 import tensorflow as tf
 
