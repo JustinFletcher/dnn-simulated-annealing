@@ -12,6 +12,8 @@ from tensorflow.examples.tutorials.mnist import mnist
 
 from tensorflow.examples.tutorials.mnist import input_data
 
+sys.path.append("../tensorflow-zoo")
+from baseline_model import *
 
 sys.path.append("../sapy")
 from sapy import *
@@ -24,454 +26,45 @@ from tfevaluator import *
 from tfacceptance import *
 
 
-# Constants used for dealing with the files, matches convert_to_records.
-TRAIN_FILE = 'train.tfrecords'
-VALIDATION_FILE = 'validation.tfrecords'
+def deep_sa_experiment(exp_parameters):
 
-
-def read_and_decode_image(filename_queue):
-
-    # Instantiate a TFRecord reader.
-    reader = tf.TFRecordReader()
-
-    # Read a single example from the input queue.
-    _, serialized_example = reader.read(filename_queue)
-
-    # Parse that example into features.
-    features = tf.parse_single_example(
-        serialized_example,
-        # Defaults are not specified since both keys are required.
-        features={
-            'image_raw': tf.FixedLenFeature([], tf.string),
-            'label': tf.FixedLenFeature([], tf.int64),
-        })
-
-    # Convert from a scalar string tensor (whose single string has
-    # length mnist.IMAGE_PIXELS) to a uint8 tensor with shape
-    # [mnist.IMAGE_PIXELS].
-    image = tf.decode_raw(features['image_raw'], tf.uint8)
-    image.set_shape([FLAGS.input_size])
-
-    # OPTIONAL: Could reshape into a 28x28 image and apply distortions
-    # here.  Since we are not applying any distortions in this
-    # example, and the next step expects the image to be flattened
-    # into a vector, we don't bother.
-
-    # Convert from [0, 255] -> [-0.5, 0.5] floats.
-    image = tf.cast(image, tf.float32) * (1. / 255) - 0.5
-
-    # Convert label from a scalar uint8 tensor to an int32 scalar.
-    label_batch = features['label']
-
-    label = tf.one_hot(label_batch,
-                       FLAGS.label_size,
-                       on_value=1.0,
-                       off_value=0.0)
-
-    return image, label
-
-
-def read_and_decode_numeric(filename_queue):
-
-    # Instantiate a TFRecord reader.
-    reader = tf.TFRecordReader()
-
-    # Read a single example from the input queue.
-    _, serialized_example = reader.read(filename_queue)
-
-    # Parse that example into features.
-    features = tf.parse_single_example(
-        serialized_example,
-        # Defaults are not specified since both keys are required.
-        features={
-            'image_raw': tf.FixedLenFeature([], tf.string),
-            'label': tf.FixedLenFeature([], tf.int64),
-        })
-
-    # Convert from a scalar string tensor (whose single string has
-    # length mnist.IMAGE_PIXELS) to a uint8 tensor with shape
-    # [mnist.IMAGE_PIXELS].
-    image = tf.decode_raw(features['image_raw'], tf.uint8)
-    image.set_shape([FLAGS.input_size])
-
-    # OPTIONAL: Could reshape into a 28x28 image and apply distortions
-    # here.  Since we are not applying any distortions in this
-    # example, and the next step expects the image to be flattened
-    # into a vector, we don't bother.
-
-    # Convert from [0, 255] -> [-0.5, 0.5] floats.
-    image = tf.cast(image, tf.float32) * (1. / 255) - 0.5
-
-    # Convert label from a scalar uint8 tensor to an int32 scalar.
-    label_batch = features['label']
-
-    label = tf.one_hot(label_batch,
-                       FLAGS.label_size,
-                       on_value=1.0,
-                       off_value=0.0)
-
-    return image, label
-
-
-def inputs(train, batch_size):
-    """Reads input data num_epochs times.
-    Args:
-      train: Selects between the training (True) and validation (False) data.
-      batch_size: Number of examples per returned batch.
-      num_epochs: Number of times to read the input data, or 0/None to
-                  train forever.
-    Returns:
-      A tuple (images, labels), where:
-      * images is a float tensor with shape [batch_size, mnist.IMAGE_PIXELS]
-        in the range [-0.5, 0.5].
-      * labels is an int32 tensor with shape [batch_size] with the true label,
-        a number in the range [0, mnist.NUM_CLASSES).
-    Note that an tf.train.QueueRunner is added to the graph, which
-    must be run using e.g. tf.train.start_queue_runners().
-    """
-
-    # Set the filename pointing to the data file.
-    filename = os.path.join(FLAGS.train_dir,
-                            TRAIN_FILE if train else VALIDATION_FILE)
-
-    # Create an input scope for the graph.
-    with tf.name_scope('input'):
-
-        # Produce a queue of files to read from.
-        filename_queue = tf.train.string_input_producer([filename],
-                                                        capacity=1)
-
-        # Even when reading in multiple threads, share the filename queue.
-        image, label = read_and_decode_image(filename_queue)
-
-        # Shuffle the examples and collect them into batch_size batches.
-        # (Internally uses a RandomShuffleQueue.)
-        # We run this in two threads to avoid being a bottleneck.
-        images, sparse_labels = tf.train.shuffle_batch(
-            [image, label],
-            batch_size=batch_size,
-            capacity=1000.0,
-            num_threads=12,
-            min_after_dequeue=100)
-
-    return images, sparse_labels
-
-
-def doublewrap(function):
-    """
-    A decorator decorator, allowing to use the decorator to be used without
-    parentheses if not arguments are provided. All arguments must be optional.
-    Decorator source:
-    https://gist.github.com/danijar/8663d3bbfd586bffecf6a0094cd116f2
-    """
-    @functools.wraps(function)
-    def decorator(*args, **kwargs):
-        if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
-            return function(args[0])
-        else:
-            return lambda wrapee: function(wrapee, *args, **kwargs)
-    return decorator
-
-
-@doublewrap
-def define_scope(function, scope=None, *args, **kwargs):
-    """
-    A decorator for functions that define TensorFlow operations. The wrapped
-    function will only be executed once. Subsequent calls to it will directly
-    return the result so that operations are added to the graph only once.
-    The operations added by the function live within a tf.variable_scope(). If
-    this decorator is used with arguments, they will be forwarded to the
-    variable scope. The scope name defaults to the name of the wrapped
-    function.
-    Decorator source:
-    https://gist.github.com/danijar/8663d3bbfd586bffecf6a0094cd116f2
-    """
-    attribute = '_cache_' + function.__name__
-    name = scope or function.__name__
-
-    @property
-    @functools.wraps(function)
-    def decorator(self):
-        if not hasattr(self, attribute):
-            with tf.variable_scope(name, *args, **kwargs):
-                setattr(self, attribute, function(self))
-        return getattr(self, attribute)
-    return decorator
-
-
-# function to print the tensor shape.  useful for debugging
-def print_tensor_shape(tensor, string):
-    ''''
-    input: tensor and string to describe it
-    '''
-
-    if __debug__:
-        print('DEBUG ' + string, tensor.get_shape())
-
-
-class Model:
-
-    def __init__(self, stimulus_placeholder, target_placeholder, keep_prob):
-
-        self.stimulus_placeholder = stimulus_placeholder
-        self.target_placeholder = target_placeholder
-        self.keep_prob = keep_prob
-        self.learning_rate = FLAGS.learning_rate
-        self.inference
-        self.loss
-        self.optimize
-        self.error
-
-    def variable_summaries(self, var):
-            """Attach a lot of summaries to a Tensor
-            (for TensorBoard visualization)."""
-
-            with tf.name_scope('summaries'):
-
-                mean = tf.reduce_mean(var)
-
-                tf.summary.scalar('mean', mean)
-
-                with tf.name_scope('stddev'):
-
-                    stddev = tf.sqrt(tf.reduce_mean(tf.square(var - mean)))
-
-                tf.summary.scalar('stddev', stddev)
-
-                tf.summary.scalar('max', tf.reduce_max(var))
-
-                tf.summary.scalar('min', tf.reduce_min(var))
-
-                tf.summary.histogram('histogram', var)
-
-            return()
-
-    def weight_variable(self, shape):
-
-        initial = tf.truncated_normal(shape, stddev=0.1)
-        self.variable_summaries(initial)
-        return tf.Variable(initial)
-
-    def bias_variable(self, shape):
-
-        initial = tf.constant(0.1, shape=shape)
-        self.variable_summaries(initial)
-        return tf.Variable(initial)
-
-    def conv2d(self, x, W):
-
-        return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
-
-    def max_pool_2x2(self, x):
-
-        return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
-                              strides=[1, 2, 2, 1], padding='SAME')
-
-    @define_scope(initializer=tf.contrib.slim.xavier_initializer())
-    def inference(self, input=None):
-        '''
-        input: tensor of input image. if none, uses instantiation input
-        output: tensor of computed logits
-        '''
-        ###############################
-        print_tensor_shape(self.stimulus_placeholder, 'images shape')
-        print_tensor_shape(self.target_placeholder, 'label shape')
-
-        # Fully-connected layer.
-        with tf.name_scope('fully_connected1'):
-
-            W_fc1 = self.weight_variable([FLAGS.input_size, FLAGS.hl_size])
-            b_fc1 = self.bias_variable([FLAGS.hl_size])
-
-            h_fc1 = tf.nn.relu(tf.matmul(self.stimulus_placeholder, W_fc1) + b_fc1)
-            print_tensor_shape(h_fc1, 'FullyConnected1 shape')
-
-        # Dropout layer.
-        with tf.name_scope('dropout'):
-
-            h_fc1_drop = tf.nn.dropout(h_fc1, self.keep_prob)
-
-        # Output layer (will be transformed via stable softmax)
-        with tf.name_scope('readout'):
-
-            W_fc2 = self.weight_variable([FLAGS.hl_size, FLAGS.label_size])
-            b_fc2 = self.bias_variable([FLAGS.label_size])
-
-            readout = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
-            print_tensor_shape(readout, 'readout shape')
-
-        return readout
-        ###############################
-
-        # print_tensor_shape(self.stimulus_placeholder, 'images shape')
-        # print_tensor_shape(self.target_placeholder, 'label shape')
-
-        # # resize the image tensors to add channels, 1 in this case
-        # # required to pass the images to various layers upcoming in the graph
-        # images_re = tf.reshape(self.stimulus_placeholder, [-1, 28, 28, 1])
-        # print_tensor_shape(images_re, 'reshaped images shape')
-
-        # # Convolution layer.
-        # with tf.name_scope('Conv1'):
-
-        #     # weight variable 4d tensor, first two dims are patch (kernel) size
-        #     # 3rd dim is number of input channels, 4th dim is output channels
-        #     W_conv1 = self.weight_variable([5, 5, 1, 32])
-        #     b_conv1 = self.bias_variable([32])
-        #     h_conv1 = tf.nn.relu(self.conv2d(images_re, W_conv1) + b_conv1)
-        #     print_tensor_shape(h_conv1, 'Conv1 shape')
-
-        # # Pooling layer.
-        # with tf.name_scope('Pool1'):
-
-        #     h_pool1 = self.max_pool_2x2(h_conv1)
-        #     print_tensor_shape(h_pool1, 'MaxPool1 shape')
-
-        # # Conv layer.
-        # with tf.name_scope('Conv2'):
-
-        #     W_conv2 = self.weight_variable([5, 5, 32, 64])
-        #     b_conv2 = self.bias_variable([64])
-        #     h_conv2 = tf.nn.relu(self.conv2d(h_pool1, W_conv2) + b_conv2)
-        #     print_tensor_shape(h_conv2, 'Conv2 shape')
-
-        # # Pooling layer.
-        # with tf.name_scope('Pool2'):
-
-        #     h_pool2 = self.max_pool_2x2(h_conv2)
-        #     print_tensor_shape(h_pool2, 'MaxPool2 shape')
-
-        # # Fully-connected layer.
-        # with tf.name_scope('fully_connected1'):
-
-        #     h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64])
-        #     print_tensor_shape(h_pool2_flat, 'MaxPool2_flat shape')
-
-        #     W_fc1 = self.weight_variable([7 * 7 * 64, 1024])
-        #     b_fc1 = self.bias_variable([1024])
-
-        #     h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
-        #     print_tensor_shape(h_fc1, 'FullyConnected1 shape')
-
-        # # Dropout layer.
-        # with tf.name_scope('dropout'):
-
-        #     h_fc1_drop = tf.nn.dropout(h_fc1, FLAGS.keep_prob)
-
-        # # Output layer (will be transformed via stable softmax)
-        # with tf.name_scope('readout'):
-
-        #     W_fc2 = self.weight_variable([1024, 10])
-        #     b_fc2 = self.bias_variable([10])
-
-        #     readout = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
-        #     print_tensor_shape(readout, 'readout shape')
-
-        # return readout
-        ###############################
-
-    @define_scope
-    def loss(self):
-
-        # Compute the cross entropy.
-        xe = tf.nn.softmax_cross_entropy_with_logits(
-            labels=self.target_placeholder, logits=self.inference,
-            name='xentropy')
-
-        # Take the mean of the cross entropy.
-        loss = tf.reduce_mean(xe, name='xentropy_mean')
-
-        return(loss)
-
-    @define_scope
-    def optimize(self):
-
-        # Compute the cross entropy.
-        xe = tf.nn.softmax_cross_entropy_with_logits(
-            labels=self.target_placeholder, logits=self.inference,
-            name='xentropy')
-
-        # Take the mean of the cross entropy.
-        loss = tf.reduce_mean(xe, name='xentropy_mean')
-
-        # Minimize the loss by incrementally changing trainable variables.
-        return tf.train.AdamOptimizer(self.learning_rate).minimize(loss)
-
-    @define_scope
-    def error(self):
-
-        mistakes = tf.not_equal(tf.argmax(self.target_placeholder, 1),
-                                tf.argmax(self.inference, 1))
-        error = tf.reduce_mean(tf.cast(mistakes, tf.float32))
-        # tf.summary.scalar('error', error)
-        return(error)
-
-
-def create_model():
-
-    # Build placeholders for the input and desired response.
-    stimulus_placeholder = tf.placeholder(tf.float32, [None, FLAGS.input_size])
-    target_placeholder = tf.placeholder(tf.int32, [None, FLAGS.label_size])
-    keep_prob = tf.placeholder(tf.float32)
-
-    # Instantiate a model.
-    model = Model(stimulus_placeholder, target_placeholder, keep_prob)
-
-    return(model)
-
-
-def run_experiment(batch_size, hl_size, optimizer):
+    # Unpack the experimental parameters.
+    (optimizer, batch_size, rep) = exp_parameters
 
     # Reset the default graph.
     tf.reset_default_graph()
-
-    print('-------------------------------------------------------')
-    print('batch_size = %d | hl_size = %d' % (batch_size, hl_size))
-    print('-------------------------------------------------------')
-
-    # Overwrite flag defualt for this experiment
-    FLAGS.batch_size = batch_size
-    FLAGS.hl_size = hl_size
-    FLAGS.optimizer = optimizer
 
     # Declare experimental measurement vars.
     steps = []
     val_losses = []
     train_losses = []
-
-    # Get input data.
-    image_batch, label_batch = inputs(train=True,
-                                      batch_size=FLAGS.batch_size)
+    mean_running_times = []
 
     # Instantiate a model.
-    model = create_model()
+    model = Model(FLAGS.input_size, FLAGS.label_size, FLAGS.learning_rate,
+                  FLAGS.thread_count, FLAGS.val_enqueue_threads,
+                  FLAGS.data_dir, FLAGS.train_file, FLAGS.validation_file)
 
-    # Instantiate a TensorFlow state object to be annealed.
+    # Instantiate TensorFlow  annealing objects.
     tf_state = TensorFlowState()
-
-    # Instantiate a TensorFlow state perturber.
     tf_perturber = TensorFlowPerturberFSA(FLAGS.learning_rate)
-
-    # Instantiate a TensorFlow cost evaluator.
     tf_cost_evaluator = TensorFlowCostEvaluator(model.loss)
 
-    merged = tf.summary.merge_all()
-
     # Get input data.
-    mnist = input_data.read_data_sets(FLAGS.data_dir + '/mnist/', one_hot=True)
+    image_batch, label_batch = model.get_train_batch_ops(batch_size=batch_size)
+    (val_image_batch, val_label_batch) = model.get_val_batch_ops(
+        batch_size=FLAGS.val_batch_size)
 
-    # init_op = [tf.global_variables_initializer()]
+    # Merge the summary.
+    tf.summary.merge_all()
 
     # Instantiate a session and initialize it.
     sv = tf.train.Supervisor(logdir=FLAGS.log_dir, save_summaries_secs=10.0)
-    # sess = sv.managed_session()
 
     with sv.managed_session() as sess:
 
-        # sess.run(init_op)
-
-        # train_writer = tf.summary.FileWriter(FLAGS.log_dir + '/train',
-                                             # sess.graph)
+        # train_writer = tf.summary.FileWriter(FLAGS.log_dir +
+        #                                      '/train', sess.graph)
         # test_writer = tf.summary.FileWriter(FLAGS.log_dir + '/test')
 
         tf_state.start(sess=sess)
@@ -484,104 +77,103 @@ def run_experiment(batch_size, hl_size, optimizer):
                             FLAGS.init_temp)
 
         # Declare timekeeping vars.
-        total_time = 0
-        i_delta = 0
-
-
+        running_times = []
+        optimize_step_running_time = 0
 
         # Print a line for debug.
-        print('step | train_loss | train_error | val_loss | val_error | t | total_time')
+        print('step | train_loss | train_error | val_loss | \
+               val_error | t | total_time')
 
-        # Grab an inital batch by running the batch ops.
-        train_images, train_labels = sess.run([image_batch, label_batch])
+        # Load the validation set batch into memory.
+        val_images, val_labels = sess.run([val_image_batch, val_label_batch])
 
         # Iterate until max steps.
         for i in range(FLAGS.max_steps):
-
-            # Hack the start time.
-            i_start = time.time()
 
             # Check for break.
             if sv.should_stop():
                 break
 
-            # Check for batch interval.
-            if(i % FLAGS.batch_interval == 0):
+            # If we have reached a testing interval, test.
+            if i % FLAGS.test_interval == 1:
+
+                # Update the batch, so as to not underestimate the train error.
+                train_images, train_labels = sess.run([image_batch,
+                                                       label_batch])
+
+                # Make a dict to load the batch onto the placeholders.
+                train_dict = {model.stimulus_placeholder: train_images,
+                              model.target_placeholder: train_labels,
+                              model.keep_prob: 1.0}
+
+                # Compute error over the training set.
+                train_error = sess.run(model.error, train_dict)
+
+                # Compute loss over the training set.
+                train_loss = sess.run(model.loss, train_dict)
+
+                # Make a dict to load the val batch onto the placeholders.
+                val_dict = {model.stimulus_placeholder: val_images,
+                            model.target_placeholder: val_labels,
+                            model.keep_prob: 1.0}
+
+                # Compute error over the validation set.
+                val_error = sess.run(model.error, val_dict)
+
+                # Compute loss over the validation set.
+                val_loss = sess.run(model.loss, val_dict)
+
+                # Store the data we wish to manually report.
+                steps.append(i)
+                train_losses.append(train_loss)
+                val_losses.append(val_loss)
+                mean_running_times.append(np.mean(running_times))
+
+                # Print relevant values.
+                print('%d | %.6f | %.2f | %.6f | %.2f | %.6f | %.2f'
+                      % (i,
+                         train_loss,
+                         train_error,
+                         val_loss,
+                         val_error,
+                         np.mean(running_times),
+                         np.sum(running_times)))
+
+            # Hack the start time.
+            start_time = time.time()
+
+            # If it is a batch refresh interval, refresh the batch.
+            if((i % batch_interval == 0) or (i == 0)):
 
                 # Update the batch.
                 train_images, train_labels = sess.run([image_batch,
                                                        label_batch])
 
-            # Check for reannealing
-            if(i % FLAGS.reanneal_interval == 0):
+            # Make a dict to load the batch onto the placeholders.
+            train_dict = {model.stimulus_placeholder: train_images,
+                          model.target_placeholder: train_labels,
+                          model.keep_prob: FLAGS.keep_prob}
 
-                # Reanneal the model.
-                annealer.reanneal()
+            # Train the model on the batch.
+            if FLAGS.optimizer == 'annealer':
 
-            # If we have reached a testing interval, test.
-            if i % FLAGS.test_interval == 0:
+                annealer(input_data=train_dict)
 
-                # Load the full dataset.
-                val_images, val_labels = mnist.test.images, mnist.test.labels
+            elif FLAGS.optimizer == 'sgd':
 
-                # Grab the train dictionary.
-                train_dict = {model.stimulus_placeholder: train_images,
-                              model.target_placeholder: train_labels,
-                              model.keep_prob: 1.0}
+                sess.run(model.optimize, feed_dict=train_dict)
 
-                # Compute error over the test set.
-                train_error = sess.run(model.error, train_dict)
-
-                # Compute error over the test set.
-                train_loss = sess.run(model.loss, train_dict)
-
-                val_dict = {model.stimulus_placeholder: val_images,
-                            model.target_placeholder: val_labels,
-                            model.keep_prob: 1.0}
-
-                # Compute error over the test set.
-                val_error = sess.run(model.error, val_dict)
-
-                # Compute error over the test set.
-                val_loss = sess.run(model.loss, val_dict)
-
-                steps.append(i)
-                train_losses.append(train_loss)
-                val_losses.append(val_loss)
-
-                print_tuple = (i, train_loss, train_error, val_loss,
-                               val_error, i_delta, total_time)
-
-                print('%d | %.6f | %.2f | %.6f | %.2f | %.6f | %.2f' % print_tuple)
-
-            # Iterate, training the network.
             else:
 
-                # Grab a batch
-                # images, labels = mnist.train.next_batch(FLAGS.batch_size)
-                train_dict = {model.stimulus_placeholder: train_images,
-                              model.target_placeholder: train_labels,
-                              model.keep_prob: FLAGS.keep_prob}
+                print("That is not a valid optimizer.")
+                break
 
-                # Train the model on the batch.
-                if FLAGS.optimizer == 'annealer':
+            # train_writer.add_summary(summary, i)
 
-                    annealer(input_data=train_dict)
-
-                elif FLAGS.optimizer == 'sgd':
-
-                    sess.run(model.optimize, feed_dict=train_dict)
-
-                else:
-
-                    print("That is not a valid optimizer.")
-                    break
-
-                # train_writer.add_summary(summary, i)
-
-            i_stop = time.time()
-            i_delta = i_stop - i_start
-            total_time = total_time + i_delta
+            # Update timekeeping variables.
+            stop_time = time.time()
+            optimize_step_running_time = stop_time - start_time
+            running_times.append(optimize_step_running_time)
 
         # Close the summary writers.
         # test_writer.close()
@@ -589,10 +181,7 @@ def run_experiment(batch_size, hl_size, optimizer):
         sv.stop()
         sess.close()
 
-    return([steps, train_losses, val_losses])
-
-# Experimental dimensions: batch_size=64..512, hl_size=8..1024, optimizer=['annealer', 'sgd']
-# Responses: train_error, val_error, information_plane_graph
+    return(steps, train_losses, val_losses, mean_running_times)
 
 
 def main(_):
@@ -603,70 +192,81 @@ def main(_):
 
     tf.gfile.MakeDirs(FLAGS.log_dir)
 
-    outputs = []
+    # Create a list to store result vectors.
+    experimental_outputs = []
 
+    # Establish the dependent variables of the experiment.
+    reps = range(2)
     optimizers = ['annealer', 'sgd']
-
     batch_sizes = [128, 256, 512, 1024, 2048, 4096, 8192]
 
-    hl_sizes = [16, 16, 16, 16]
+    # Produce the Cartesian set of configurations.
+    experimental_configurations = itertools.product(optimizers,
+                                                    batch_sizes,
+                                                    reps)
 
-    for optimizer in optimizers:
+    # TODO: Create a distributed approach by parallizing over configs.
 
-        for batch_size in batch_sizes:
+    # Iterate over each experimental config.
+    for experimental_configuration in experimental_configurations:
 
-            for hl_size in hl_sizes:
+        results = deep_sa_experiment(experimental_configuration)
 
-                output = run_experiment(batch_size, hl_size, optimizer)
-
-                outputs.append([optimizer, batch_size, hl_size, output])
+        experimental_outputs.append([experimental_configuration, results])
 
     # Accomodate Python 3+
     # with open(FLAGS.log_dir + '/sa_generalization_out.csv', 'w') as csvfile:
 
     # Accomodate Python 2.7 on Hokulea.
-    with open(FLAGS.log_dir + '/sa_generalization_out.csv', 'wb') as csvfile:
+    with open(FLAGS.log_dir +
+              '/deep_sa_experiment.csv', 'wb') as csvfile:
 
+        # Open a writer and write the header.
         csvwriter = csv.writer(csvfile)
-
         csvwriter.writerow(['optimizer',
                             'batch_size',
-                            'hl_size',
+                            'rep_num',
                             'step_num',
                             'train_loss',
-                            'val_loss'])
+                            'val_loss',
+                            'mean_running_time'])
 
-        for o in outputs:
+        # Iterate over each output.
+        for (experimental_configuration, results) in experimental_outputs:
 
-            optimizer, batch_size, hl_size, measurements = o
+            # TODO: Generalize this pattern to not rely on var names.
 
-            steps = measurements[0]
-            train_losses = measurements[1]
-            val_losses = measurements[2]
+            # Unpack the experimental configuration.
+            (optimizer,
+             batch_size,
+             rep) = experimental_configuration
 
-            print('entering step loop')
+            # Unpack the cooresponding results.
+            (steps, train_losses, val_losses, mean_running_times) = results
 
-            for step, tl, vl in zip(steps,
-                                    train_losses,
-                                    val_losses):
+            # Iterate over the results vectors for each config.
+            for (step, tl, vl, mrt) in zip(steps,
+                                           train_losses,
+                                           val_losses,
+                                           mean_running_times):
 
-                csvwriter.writerow([optimizer,
+                # Write the data to a csv.
+                csvwriter.writerow([thread_count,
                                     batch_size,
-                                    hl_size,
+                                    batch_interval,
+                                    rep,
                                     step,
                                     tl,
-                                    vl])
-
-# Instrumentation: Loss function stability by batch size.
+                                    vl,
+                                    mrt])
 
 
 if __name__ == '__main__':
 
+    # Instantiate an arg parser.
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--fake_data', nargs='?', const=True, type=bool,
-                        default=False,
-                        help='If true, uses fake data for unit testing.')
+    # Establish default arguements.
 
     parser.add_argument('--max_steps', type=int, default=50000,
                         help='Number of steps to run trainer.')
@@ -678,12 +278,44 @@ if __name__ == '__main__':
                         help='Initial learning rate')
 
     parser.add_argument('--data_dir', type=str,
-                        default='../data',
-                        help='Directory for storing input data')
+                        default='../data/mnist',
+                        help='Directory from which to pull data.')
 
     parser.add_argument('--log_dir', type=str,
-                        default='../log/tensorboard',
-                        help='Summaries log directory')
+                        default='../log/deep_sa_generalization/',
+                        help='Summaries log directory.')
+
+    parser.add_argument('--val_batch_size', type=int,
+                        default=10000,
+                        help='Validation set batch size.')
+
+    parser.add_argument('--keep_prob', type=float,
+                        default=1.0,
+                        help='Keep probability for output layer dropout.')
+
+    parser.add_argument('--input_size', type=int,
+                        default=28 * 28,
+                        help='Dimensionality of the input space.')
+
+    parser.add_argument('--label_size', type=int,
+                        default=10,
+                        help='Dimensinoality of the output space.')
+
+    parser.add_argument('--train_file', type=str,
+                        default='train.tfrecords',
+                        help='Training dataset filename.')
+
+    parser.add_argument('--validation_file', type=str,
+                        default='validation.tfrecords',
+                        help='Validation dataset filename.')
+
+    parser.add_argument('--val_enqueue_threads', type=int,
+                        default=32,
+                        help='Number of threads to enqueue val examples.')
+
+    parser.add_argument('--thread_count', type=int,
+                        default=32,
+                        help='Number of threads to enqueue training examples.')
 
     parser.add_argument('--batch_size', type=int,
                         default=256,
@@ -697,10 +329,6 @@ if __name__ == '__main__':
                         default=500000,
                         help='Batch size.')
 
-    parser.add_argument('--train_dir', type=str,
-                        default='../data',
-                        help='Directory with the training data.')
-
     parser.add_argument('--hl_size', type=int,
                         default=128,
                         help='Directory with the training data.')
@@ -713,14 +341,6 @@ if __name__ == '__main__':
                         default=1.0,
                         help='Initial temperature for SA algorithm')
 
-    parser.add_argument('--input_size', type=int,
-                        default=28 * 28,
-                        help='Dimensionality of the input space.')
-
-    parser.add_argument('--label_size', type=int,
-                        default=10,
-                        help='Dimensinoality of the output space.')
-
     parser.add_argument('--optimizer', type=str,
                         default='sgd',
                         help='Optimization algorthim to use in this run.')
@@ -730,8 +350,8 @@ if __name__ == '__main__':
     tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
 
 
-# Experimental dimensions: batch_size=64..512, hl_size=8..1024, optimizer=['annealer', 'sgd']
-# Responses: train_error, val_error, information_plane_graph
+    # Parse known arguements.
+    FLAGS, unparsed = parser.parse_known_args()
 
-# For SGD and annealing.
-# Plot training set loss (mean, std) vs. validation set loss (mean, std)
+    # # Run the main function as TF app.
+    tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
