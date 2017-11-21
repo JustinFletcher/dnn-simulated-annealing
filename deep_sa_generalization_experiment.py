@@ -198,9 +198,9 @@ def main(_):
     experimental_outputs = []
 
     # Establish the dependent variables of the experiment.
-    reps = range(10)
+    reps = range(2)
     optimizers = ['annealer', 'sgd']
-    batch_sizes = [128, 256, 512, 1024, 2048, 4096, 8192, 16384]
+    batch_sizes = [128, 256]
 
     # Produce the Cartesian set of configurations.
     experimental_configurations = itertools.product(optimizers,
