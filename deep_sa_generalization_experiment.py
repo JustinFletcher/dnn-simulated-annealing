@@ -48,7 +48,7 @@ def deep_sa_experiment(exp_parameters):
 
     # Instantiate TensorFlow  annealing objects.
     tf_state = TensorFlowState()
-    tf_perturber = TensorFlowPerturber
+    tf_perturber = TensorFlowPerturberFSA()
     FSA(FLAGS.learning_rate)
     tf_cost_evaluator = TensorFlowCostEvaluator(model.loss)
 
