@@ -256,7 +256,7 @@ def main(_):
                                            mean_running_times):
 
                 # Write the data to a csv.
-                csvwriter.writerow([thread_count,
+                csvwriter.writerow([optimizer,
                                     batch_size,
                                     batch_interval,
                                     rep,
