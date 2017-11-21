@@ -29,6 +29,10 @@ from tfacceptance import *
 
 def deep_sa_experiment(exp_parameters):
 
+    print("-------------------------")
+    print(exp_parameters)
+    print("-------------------------")
+
     # Unpack the experimental parameters.
     (optimizer, batch_size, rep) = exp_parameters
 
@@ -82,8 +86,8 @@ def deep_sa_experiment(exp_parameters):
         optimize_step_running_time = 0
 
         # Print a line for debug.
-        print('step | train_loss | train_error | val_loss | \
-               val_error | t | total_time')
+        print('step | train_loss | train_error | val_loss |' +
+              ' val_error | t | total_time')
 
         # Load the validation set batch into memory.
         val_images, val_labels = sess.run([val_image_batch, val_label_batch])
@@ -156,11 +160,11 @@ def deep_sa_experiment(exp_parameters):
                           model.keep_prob: FLAGS.keep_prob}
 
             # Train the model on the batch.
-            if FLAGS.optimizer == 'annealer':
+            if optimizer == 'annealer':
 
                 annealer(input_data=train_dict)
 
-            elif FLAGS.optimizer == 'sgd':
+            elif optimizer == 'sgd':
 
                 sess.run(model.optimize, feed_dict=train_dict)
 
@@ -269,7 +273,7 @@ if __name__ == '__main__':
 
     # Establish default arguements.
 
-    parser.add_argument('--max_steps', type=int, default=10000,
+    parser.add_argument('--max_steps', type=int, default=2000,
                         help='Number of steps to run trainer.')
 
     parser.add_argument('--test_interval', type=int, default=100,
@@ -338,14 +342,9 @@ if __name__ == '__main__':
                         default=1.0,
                         help='Initial temperature for SA algorithm')
 
-    parser.add_argument('--optimizer', type=str,
-                        default='sgd',
-                        help='Optimization algorthim to use in this run.')
-
     FLAGS, unparsed = parser.parse_known_args()
 
     tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
-
 
     # Parse known arguements.
     FLAGS, unparsed = parser.parse_known_args()
