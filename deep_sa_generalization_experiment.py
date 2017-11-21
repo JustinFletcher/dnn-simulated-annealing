@@ -258,7 +258,6 @@ def main(_):
                 # Write the data to a csv.
                 csvwriter.writerow([optimizer,
                                     batch_size,
-                                    batch_interval,
                                     rep,
                                     step,
                                     tl,
