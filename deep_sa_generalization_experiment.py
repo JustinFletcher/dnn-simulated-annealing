@@ -4,9 +4,11 @@ import os
 import sys
 import csv
 import time
+import random
 import argparse
 import itertools
 import functools
+import numpy as np
 import tensorflow as tf
 
 from tensorflow.examples.tutorials.mnist import mnist
@@ -29,9 +31,9 @@ from tfacceptance import *
 
 def deep_sa_experiment(exp_parameters):
 
-    print("-------------------------")
+    print("------------exp_parameters-------------")
     print(exp_parameters)
-    print("-------------------------")
+    print("---------------------------------------")
 
     # Unpack the experimental parameters.
     (optimizer, batch_size, rep) = exp_parameters
@@ -45,11 +47,13 @@ def deep_sa_experiment(exp_parameters):
     train_losses = []
     mean_running_times = []
 
+    print("------------model_output-------------")
     # Instantiate a model.
     model = Model(FLAGS.input_size, FLAGS.label_size, FLAGS.learning_rate,
                   FLAGS.thread_count, FLAGS.val_enqueue_threads,
                   FLAGS.data_dir, FLAGS.train_file, FLAGS.validation_file)
 
+    print("-------------------------------------")
     # Instantiate TensorFlow  annealing objects.
     tf_state = TensorFlowState()
     tf_perturber = TensorFlowPerturberFSA(FLAGS.learning_rate)
@@ -64,7 +68,7 @@ def deep_sa_experiment(exp_parameters):
     tf.summary.merge_all()
 
     # Instantiate a session and initialize it.
-    sv = tf.train.Supervisor(logdir=FLAGS.log_dir, save_summaries_secs=10.0)
+    sv = tf.train.Supervisor(logdir=FLAGS.log_dir, save_summaries_secs=100.0)
 
     with sv.managed_session() as sess:
 
@@ -85,6 +89,7 @@ def deep_sa_experiment(exp_parameters):
         running_times = []
         optimize_step_running_time = 0
 
+        print("------------training_output-------------")
         # Print a line for debug.
         print('step | train_loss | train_error | val_loss |' +
               ' val_error | t | total_time')
@@ -162,7 +167,14 @@ def deep_sa_experiment(exp_parameters):
             # Train the model on the batch.
             if optimizer == 'annealer':
 
-                annealer(input_data=train_dict)
+                tv_count = len(tf.trainable_variables())
+
+                print("tv_count")
+                print(tv_count)
+
+                perturb_params = random.choice(range(tv_count))
+
+                annealer(perturb_params=perturb_params, input_data=train_dict)
 
             elif optimizer == 'sgd':
 
@@ -180,6 +192,7 @@ def deep_sa_experiment(exp_parameters):
             optimize_step_running_time = stop_time - start_time
             running_times.append(optimize_step_running_time)
 
+        print("----------------------------------------")
         # Close the summary writers.
         # test_writer.close()
         # train_writer.close()
@@ -203,7 +216,7 @@ def main(_):
     # Establish the dependent variables of the experiment.
     reps = range(2)
     optimizers = ['annealer', 'sgd']
-    batch_sizes = [128, 256]
+    batch_sizes = [128, 256, 10000]
 
     # Produce the Cartesian set of configurations.
     experimental_configurations = itertools.product(optimizers,
@@ -272,7 +285,7 @@ if __name__ == '__main__':
 
     # Establish default arguements.
 
-    parser.add_argument('--max_steps', type=int, default=2000,
+    parser.add_argument('--max_steps', type=int, default=50000,
                         help='Number of steps to run trainer.')
 
     parser.add_argument('--test_interval', type=int, default=100,
