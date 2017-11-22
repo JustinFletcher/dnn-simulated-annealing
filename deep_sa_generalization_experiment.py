@@ -215,7 +215,7 @@ def main(_):
     # Establish the dependent variables of the experiment.
     reps = range(2)
     optimizers = ['annealer', 'sgd']
-    batch_sizes = [128, 256, 32768]
+    batch_sizes = [128, 32768]
 
     # Produce the Cartesian set of configurations.
     experimental_configurations = itertools.product(optimizers,
@@ -284,7 +284,7 @@ if __name__ == '__main__':
 
     # Establish default arguements.
 
-    parser.add_argument('--max_steps', type=int, default=20000,
+    parser.add_argument('--max_steps', type=int, default=50000,
                         help='Number of steps to run trainer.')
 
     parser.add_argument('--test_interval', type=int, default=100,
@@ -298,7 +298,7 @@ if __name__ == '__main__':
                         help='Directory from which to pull data.')
 
     parser.add_argument('--log_dir', type=str,
-                        default='../log/deep_sa_generalization/',
+                        default='../log/deep_sa_generalization_20171121/',
                         help='Summaries log directory.')
 
     parser.add_argument('--val_batch_size', type=int,
@@ -350,7 +350,7 @@ if __name__ == '__main__':
                         help='Keep probability for output layer dropout.')
 
     parser.add_argument('--init_temp', type=float,
-                        default=1.0,
+                        default=5.0,
                         help='Initial temperature for SA algorithm')
 
     FLAGS, unparsed = parser.parse_known_args()
