@@ -218,7 +218,7 @@ def main(_):
     # Establish the dependent variables of the experiment.
     reps = range(2)
     optimizers = ['annealer', 'sgd']
-    batch_sizes = [128, 256]
+    batch_sizes = [128, 256, 32768]
 
     # Produce the Cartesian set of configurations.
     experimental_configurations = itertools.product(optimizers,
@@ -287,7 +287,7 @@ if __name__ == '__main__':
 
     # Establish default arguements.
 
-    parser.add_argument('--max_steps', type=int, default=2000,
+    parser.add_argument('--max_steps', type=int, default=20000,
                         help='Number of steps to run trainer.')
 
     parser.add_argument('--test_interval', type=int, default=100,
