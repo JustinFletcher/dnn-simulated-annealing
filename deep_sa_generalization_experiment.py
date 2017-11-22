@@ -169,9 +169,6 @@ def deep_sa_experiment(exp_parameters):
 
                 tv_count = len(tf.trainable_variables())
 
-                print("tv_count")
-                print(tv_count)
-
                 perturb_params = random.choice(range(tv_count))
 
                 annealer(perturb_params=perturb_params, input_data=train_dict)
@@ -201,7 +198,12 @@ def deep_sa_experiment(exp_parameters):
 
     return(steps, train_losses, val_losses, mean_running_times)
 
-
+# Experimental dimensions
+# Could hybridize SA and SGD completely - perturb gradients
+# Could hybridize with parameter - slowly switch from SGD to SA
+# Could hybridize with step - instantly switch from SGD to SA
+# Could hybridize with optimization paradigms - diff paradigms for through training
+ 
 def main(_):
 
     if tf.gfile.Exists(FLAGS.log_dir):
