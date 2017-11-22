@@ -11,10 +11,6 @@ import functools
 import numpy as np
 import tensorflow as tf
 
-from tensorflow.examples.tutorials.mnist import mnist
-
-from tensorflow.examples.tutorials.mnist import input_data
-
 sys.path.append("../tensorflow-zoo")
 from baseline_model import *
 
@@ -52,8 +48,8 @@ def deep_sa_experiment(exp_parameters):
     model = Model(FLAGS.input_size, FLAGS.label_size, FLAGS.learning_rate,
                   FLAGS.thread_count, FLAGS.val_enqueue_threads,
                   FLAGS.data_dir, FLAGS.train_file, FLAGS.validation_file)
-
     print("-------------------------------------")
+
     # Instantiate TensorFlow  annealing objects.
     tf_state = TensorFlowState()
     tf_perturber = TensorFlowPerturberLayerwiseFSA(FLAGS.learning_rate)
@@ -104,12 +100,52 @@ def deep_sa_experiment(exp_parameters):
             if sv.should_stop():
                 break
 
+            # If it is a batch refresh interval, refresh the batch.
+            if((i % FLAGS.batch_interval == 0) or (i == 0)):
+
+                # Update the batch.
+                train_images, train_labels = sess.run([image_batch,
+                                                       label_batch])
+
+            # Hack the start time.
+            start_time = time.time()
+
+            # Make a dict to load the batch onto the placeholders.
+            train_dict = {model.stimulus_placeholder: train_images,
+                          model.target_placeholder: train_labels,
+                          model.keep_prob: FLAGS.keep_prob}
+
+            # Train the model on the batch.
+            if optimizer == 'annealer':
+
+                tv_count = len(tf.trainable_variables())
+
+                perturb_params = random.choice(range(tv_count))
+
+                annealer(perturb_params=perturb_params, input_data=train_dict)
+
+            elif optimizer == 'sgd':
+
+                sess.run(model.optimize, feed_dict=train_dict)
+
+            else:
+
+                print("That is not a valid optimizer.")
+                break
+
+            # train_writer.add_summary(summary, i)
+
+            # Update timekeeping variables.
+            stop_time = time.time()
+            optimize_step_running_time = stop_time - start_time
+            running_times.append(optimize_step_running_time)
+
             # If we have reached a testing interval, test.
             if i % FLAGS.test_interval == 1:
 
                 # Update the batch, so as to not underestimate the train error.
-                train_images, train_labels = sess.run([image_batch,
-                                                       label_batch])
+                # train_images, train_labels = sess.run([image_batch,
+                #                                        label_batch])
 
                 # Make a dict to load the batch onto the placeholders.
                 train_dict = {model.stimulus_placeholder: train_images,
@@ -149,46 +185,6 @@ def deep_sa_experiment(exp_parameters):
                          np.mean(running_times),
                          np.sum(running_times)))
 
-            # Hack the start time.
-            start_time = time.time()
-
-            # If it is a batch refresh interval, refresh the batch.
-            if((i % FLAGS.batch_interval == 0) or (i == 0)):
-
-                # Update the batch.
-                train_images, train_labels = sess.run([image_batch,
-                                                       label_batch])
-
-            # Make a dict to load the batch onto the placeholders.
-            train_dict = {model.stimulus_placeholder: train_images,
-                          model.target_placeholder: train_labels,
-                          model.keep_prob: FLAGS.keep_prob}
-
-            # Train the model on the batch.
-            if optimizer == 'annealer':
-
-                tv_count = len(tf.trainable_variables())
-
-                perturb_params = random.choice(range(tv_count))
-
-                annealer(perturb_params=perturb_params, input_data=train_dict)
-
-            elif optimizer == 'sgd':
-
-                sess.run(model.optimize, feed_dict=train_dict)
-
-            else:
-
-                print("That is not a valid optimizer.")
-                break
-
-            # train_writer.add_summary(summary, i)
-
-            # Update timekeeping variables.
-            stop_time = time.time()
-            optimize_step_running_time = stop_time - start_time
-            running_times.append(optimize_step_running_time)
-
         print("----------------------------------------")
         # Close the summary writers.
         # test_writer.close()
@@ -202,8 +198,9 @@ def deep_sa_experiment(exp_parameters):
 # Could hybridize SA and SGD completely - perturb gradients
 # Could hybridize with parameter - slowly switch from SGD to SA
 # Could hybridize with step - instantly switch from SGD to SA
-# Could hybridize with optimization paradigms - diff paradigms for through training
- 
+# Could hybridize with optimization paradigms - diff paradigms through training
+
+
 def main(_):
 
     if tf.gfile.Exists(FLAGS.log_dir):
