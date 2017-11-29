@@ -139,7 +139,7 @@ def main(FLAGS):
 
             except: 
 
-                jon_complete = True
+                job_complete = True
                 
             # Print a diagnostic.
             print('Job ' + job_id[:-1] + ' complete? ' +
