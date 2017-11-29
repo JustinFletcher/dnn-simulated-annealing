@@ -58,10 +58,6 @@ def deep_sa_experiment():
 
         tf_perturber = TensorFlowPerturberFSA(FLAGS.learning_rate)
 
-    elif FLAGS.optimizer == 'csa_annealer':
-
-        tf_perturber = TensorFlowPerturberCSA(FLAGS.learning_rate)
-
     else:
 
         tf_perturber = TensorFlowPerturberFSA(FLAGS.learning_rate)
@@ -201,8 +197,21 @@ def deep_sa_experiment():
                          np.mean(running_times),
                          np.sum(running_times)))
 
+        print("----------------------------------------")
+        # Close the summary writers.
+        # test_writer.close()
+        # train_writer.close()
+        sv.stop()
+        sess.close()
 
-                      train_losses,
+    with open(FLAGS.log_dir + '/' + FLAGS.log_filename, 'wb') as csvfile:
+
+        # Open a writer and write the header.
+        csvwriter = csv.writer(csvfile)
+
+        # Iterate over the results vectors for each config.
+        for (step, tl, vl, mrt) in zip(steps,
+                                       train_losses,
                                        val_losses,
                                        mean_running_times):
 
