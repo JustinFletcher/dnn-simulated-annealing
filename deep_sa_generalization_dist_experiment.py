@@ -48,8 +48,23 @@ def deep_sa_experiment():
 
     # Instantiate TensorFlow  annealing objects.
     tf_state = TensorFlowState()
-    tf_perturber = TensorFlowPerturberLayerwiseFSA(FLAGS.learning_rate)
     tf_cost_evaluator = TensorFlowCostEvaluator(model.loss)
+
+    if FLAGS.optimizer == 'layerwise_fsa_annealer':
+
+        tf_perturber = TensorFlowPerturberLayerwiseFSA(FLAGS.learning_rate)
+
+    elif FLAGS.optimizer == 'fsa_annealer':
+
+        tf_perturber = TensorFlowPerturberFSA(FLAGS.learning_rate)
+
+    elif FLAGS.optimizer == 'csa_annealer':
+
+        tf_perturber = TensorFlowPerturberCSA(FLAGS.learning_rate)
+
+    else:
+
+        tf_perturber = TensorFlowPerturberCSA(FLAGS.learning_rate)
 
     # Get input data.
     image_batch, label_batch = model.get_train_batch_ops(
@@ -121,6 +136,31 @@ def deep_sa_experiment():
                 perturb_params = random.choice(range(tv_count))
 
                 annealer(perturb_params=perturb_params, input_data=train_dict)
+
+            elif FLAGS.optimizer == 'sgd':
+
+                sess.run(model.optimize, feed_dict=train_dict)
+
+            else:
+
+                print("That is not a valid optimizer.")
+                break
+
+            if FLAGS.optimizer == 'layerwise_fsa_annealer':
+
+                tv_count = len(tf.trainable_variables())
+
+                perturb_params = random.choice(range(tv_count))
+
+                annealer(perturb_params=perturb_params, input_data=train_dict)
+
+            elif FLAGS.optimizer == 'fsa_annealer':
+
+                annealer(input_data=train_dict)
+
+            elif FLAGS.optimizer == 'csa_annealer':
+
+                annealer(input_data=train_dict)
 
             elif FLAGS.optimizer == 'sgd':
 
@@ -218,79 +258,6 @@ def deep_sa_experiment():
 
 def main(_):
 
-    # if tf.gfile.Exists(FLAGS.log_dir):
-
-    #     tf.gfile.DeleteRecursively(FLAGS.log_dir)
-
-    # tf.gfile.MakeDirs(FLAGS.log_dir)
-
-    # # Create a list to store result vectors.
-    # experimental_outputs = []
-
-    # # Establish the dependent variables of the experiment.
-    # reps = range(2)
-    # optimizers = ['annealer', 'sgd']
-    # batch_sizes = [128, 32768]
-
-    # # Produce the Cartesian set of configurations.
-    # experimental_configurations = itertools.product(optimizers,
-    #                                                 batch_sizes,
-    #                                                 reps)
-
-    # # TODO: Create a distributed approach by parallizing over configs.
-
-    # # Iterate over each experimental config.
-    # for experimental_configuration in experimental_configurations:
-
-    #     results = deep_sa_experiment(experimental_configuration)
-
-    #     experimental_outputs.append([experimental_configuration, results])
-
-    # Accomodate Python 3+
-    # with open(FLAGS.log_dir + '/sa_generalization_out.csv', 'w') as csvfile:
-
-    # Accomodate Python 2.7 on Hokulea.
-    # with open(FLAGS.log_dir +
-    #           '/deep_sa_experiment.csv', 'wb') as csvfile:
-
-    #     # Open a writer and write the header.
-    #     csvwriter = csv.writer(csvfile)
-    #     csvwriter.writerow(['optimizer',
-    #                         'batch_size',
-    #                         'rep_num',
-    #                         'step_num',
-    #                         'train_loss',
-    #                         'val_loss',
-    #                         'mean_running_time'])
-
-    #     # Iterate over each output.
-    #     for (experimental_configuration, results) in experimental_outputs:
-
-    #         # TODO: Generalize this pattern to not rely on var names.
-
-    #         # Unpack the experimental configuration.
-    #         (optimizer,
-    #          batch_size,
-    #          rep) = experimental_configuration
-
-    #         # Unpack the cooresponding results.
-    #         (steps, train_losses, val_losses, mean_running_times) = results
-
-    #         # Iterate over the results vectors for each config.
-    #         for (step, tl, vl, mrt) in zip(steps,
-    #                                        train_losses,
-    #                                        val_losses,
-    #                                        mean_running_times):
-
-    #             # Write the data to a csv.
-    #             csvwriter.writerow([optimizer,
-    #                                 batch_size,
-    #                                 rep,
-    #                                 step,
-    #                                 tl,
-    #                                 vl,
-    #                                 mrt])
-
     return(deep_sa_experiment())
 
 
@@ -383,8 +350,8 @@ if __name__ == '__main__':
                         help='Interval between training batch refresh.')
 
     parser.add_argument('--optimizer', type=str,
-                        default='annealer',
-                        help='Interval between training batch refresh.')
+                        default='csa_annealer',
+                        help='Optimizer to use.')
 
     # Parse known arguements.
     FLAGS, unparsed = parser.parse_known_args()
