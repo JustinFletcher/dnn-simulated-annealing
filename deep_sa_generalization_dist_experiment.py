@@ -366,6 +366,10 @@ if __name__ == '__main__':
                         default=0,
                         help='Flag identifying the repitition number.')
 
+    parser.add_argument('--log_filename', type=str,
+                        default='deep_sa_generalization_experiment.csv',
+                        help='Summaries log directory.')
+
     parser.add_argument('--train_enqueue_threads', type=int,
                         default=128,
                         help='Number of threads to enqueue train examples.')
