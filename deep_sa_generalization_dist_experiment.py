@@ -128,24 +128,6 @@ def deep_sa_experiment():
                           model.target_placeholder: train_labels,
                           model.keep_prob: FLAGS.keep_prob}
 
-            # Train the model on the batch.
-            if FLAGS.optimizer == 'annealer':
-
-                tv_count = len(tf.trainable_variables())
-
-                perturb_params = random.choice(range(tv_count))
-
-                annealer(perturb_params=perturb_params, input_data=train_dict)
-
-            elif FLAGS.optimizer == 'sgd':
-
-                sess.run(model.optimize, feed_dict=train_dict)
-
-            else:
-
-                print("That is not a valid optimizer.")
-                break
-
             if FLAGS.optimizer == 'layerwise_fsa_annealer':
 
                 tv_count = len(tf.trainable_variables())
