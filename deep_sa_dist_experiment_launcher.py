@@ -23,7 +23,7 @@ def main(FLAGS):
     tf.gfile.MakeDirs(FLAGS.log_dir)
 
     # Declare experimental flags.
-    exp_design = [('rep_num', range(1)),
+    exp_design = [('rep_num', range(2)),
                   ('train_batch_size', [128, 10000]),
                   ('optimizer', ['sgd',
                                  'layerwise_fsa_annealer',
@@ -127,8 +127,12 @@ def main(FLAGS):
                                  stdout=subprocess.PIPE,
                                  shell=True)
 
+            output = p.communicate()
+
+            print(output)
+
             # Read the qstat stdout, parse the state, and conv to Boolean.
-            job_complete = p.communicate()[0].split()[-2] == 'E'
+            job_complete = output[0].split()[-2] == 'E'
 
             # Print a diagnostic.
             print('Job ' + job_id[:-1] + ' complete? ' +
