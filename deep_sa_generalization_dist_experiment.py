@@ -140,10 +140,6 @@ def deep_sa_experiment():
 
                 annealer(input_data=train_dict)
 
-            elif FLAGS.optimizer == 'csa_annealer':
-
-                annealer(input_data=train_dict)
-
             elif FLAGS.optimizer == 'sgd':
 
                 sess.run(model.optimize, feed_dict=train_dict)
@@ -332,7 +328,7 @@ if __name__ == '__main__':
                         help='Interval between training batch refresh.')
 
     parser.add_argument('--optimizer', type=str,
-                        default='csa_annealer',
+                        default='fsa_annealer',
                         help='Optimizer to use.')
 
     # Parse known arguements.
