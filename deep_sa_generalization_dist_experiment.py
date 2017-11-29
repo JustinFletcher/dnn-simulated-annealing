@@ -378,6 +378,10 @@ if __name__ == '__main__':
                         default=500000,
                         help='Interval between training batch refresh.')
 
+    parser.add_argument('--optimizer', type=str,
+                        default='annealer',
+                        help='Interval between training batch refresh.')
+
     # Parse known arguements.
     FLAGS, unparsed = parser.parse_known_args()
 
