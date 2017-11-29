@@ -24,8 +24,7 @@ def main(FLAGS):
 
     # Declare experimental flags.
     exp_design = [('rep_num', range(1)),
-                  ('train_enqueue_threads', [16]),
-                  ('train_batch_size', [16, 32])]
+                  ('optimizer', ['sgd', 'annealer'])]
 
     # Translate the design structure into flag strings.
     exp_flag_strings = [['--' + f + '=' + str(v) for v in r]
@@ -193,11 +192,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--log_dir', type=str,
-                        default='../log/sample_dist_experiment/',
+                        default='../log/deep_sa_generalization_dist_experiment/',
                         help='Summaries log directory.')
 
     parser.add_argument('--log_filename', type=str,
-                        default='sample_dist_experiment.csv',
+                        default='deep_sa_generalization_dist_experiment.csv',
                         help='Merged output filename.')
 
     parser.add_argument('--max_runtime', type=int,
@@ -205,7 +204,7 @@ if __name__ == '__main__':
                         help='Number of seconds to run before giving up.')
 
     parser.add_argument('--experiment_py_file', type=str,
-                        default='~/tensorflow-zoo/sample_dist_experiment.py',
+                        default='~/dnn-simulated-annealing/deep_sa_generalization_dist_experiment.py',
                         help='Number of seconds to run before giving up.')
 
     # Parse known arguements.
