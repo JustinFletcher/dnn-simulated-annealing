@@ -121,6 +121,8 @@ def main(FLAGS):
         # Iterate over each job id string.
         for job_id in job_ids:
 
+            # TODO: Handle job completion gracefully.
+
             # Issue qstat command to get job status.
             p = subprocess.Popen('qstat -r ' + job_id,
                                  stdin=subprocess.PIPE,
@@ -131,9 +133,14 @@ def main(FLAGS):
 
             print(output)
 
-            # Read the qstat stdout, parse the state, and conv to Boolean.
-            job_complete = output[0].split()[-2] == 'E'
+            try:
+                # Read the qstat stdout, parse the state, and conv to Boolean.
+                job_complete = output[0].split()[-2] == 'E'
 
+            except: 
+
+                jon_complete = True
+                
             # Print a diagnostic.
             print('Job ' + job_id[:-1] + ' complete? ' +
                   str(job_complete) + '.')
