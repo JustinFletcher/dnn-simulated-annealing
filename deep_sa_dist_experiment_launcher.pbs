@@ -9,7 +9,7 @@
 #PBS -l select=1:mpiprocs=20:ncpus=20
 ## Enter the proper queue
 #PBS -q standard
-2#PBS -A MHPCC96670DA1 
+#PBS -A MHPCC96670DA1 
 cp -R ~/data $WORKDIR
 module load anaconda2
 module load tensorflow
