@@ -14,4 +14,4 @@ cp -R ~/data $WORKDIR
 module load anaconda2
 module load tensorflow
 cd ~/dnn-simulated-annealing
-python deep_sa_experiment_launcher.py
+python deep_sa_dist_experiment_launcher.py
