@@ -23,8 +23,8 @@ def main(FLAGS):
     tf.gfile.MakeDirs(FLAGS.log_dir)
 
     # Declare experimental flags.
-    exp_design = [('rep_num', range(2)),
-                  ('train_batch_size', [128, 10000]),
+    exp_design = [('rep_num', range(5)),
+                  ('train_batch_size', [128, 256]),
                   ('optimizer', ['sgd',
                                  'layerwise_fsa_annealer',
                                  'fsa_annealer'])]
