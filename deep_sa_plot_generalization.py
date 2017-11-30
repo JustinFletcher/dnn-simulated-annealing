@@ -46,8 +46,8 @@ for i, bs in enumerate(df.train_batch_size.unique()):
                          1,
                          plot_num)
 
-    ax.set_xlim(0.001, 10)
-    ax.set_ylim(0.1, 1000)
+    # ax.set_xlim(0.001, 1000)
+    # ax.set_ylim(0.1, 1000)
 
     for k, opt in enumerate(df.optimizer.unique()):
 

@@ -137,10 +137,10 @@ def main(FLAGS):
                 # Read the qstat stdout, parse the state, and conv to Boolean.
                 job_complete = output[0].split()[-2] == 'E'
 
-            except: 
+            except:
 
                 job_complete = True
-                
+
             # Print a diagnostic.
             print('Job ' + job_id[:-1] + ' complete? ' +
                   str(job_complete) + '.')
@@ -150,10 +150,9 @@ def main(FLAGS):
             if job_complete:
 
                 p = subprocess.Popen('qdel -Wforce ' + job_id,
-                                 stdin=subprocess.PIPE,
-                                 stdout=subprocess.PIPE,
-                                 shell=True)
-
+                                     stdin=subprocess.PIPE,
+                                     stdout=subprocess.PIPE,
+                                     shell=True)
 
         # And the job complete flags together.
         jobs_complete = (all(job_complete_flags))
