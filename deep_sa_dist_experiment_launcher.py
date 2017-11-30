@@ -24,7 +24,7 @@ def main(FLAGS):
 
     # Declare experimental flags.
     exp_design = [('rep_num', range(2)),
-                  ('train_batch_size', [128, 256]),
+                  ('train_batch_size', [128, 10000]),
                   ('optimizer', ['sgd',
                                  'layerwise_fsa_annealer',
                                  'fsa_annealer'])]
@@ -97,6 +97,7 @@ def main(FLAGS):
 
         # Send job_string to qsub.
         job_ids.append(p.communicate(job_string)[0])
+        time.sleep(0.1)
 
         print("-----------------")
 
