@@ -11,6 +11,8 @@ from mpl_toolkits.axes_grid1 import Grid
 plt.style.use('ggplot')
 
 df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa_generalization_dist_experiment/deep_sa_generalization_dist_experiment.csv')
+# 
+# df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa_generalization/deep_sa_experiment.csv')
 
 # max_running_time = np.max(df.running_time)
 # print(max_running_time)
