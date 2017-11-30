@@ -10,7 +10,7 @@ from mpl_toolkits.axes_grid1 import Grid
 
 plt.style.use('ggplot')
 
-df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa_generalization_dist_experiment/deep_sa_generalization_dist_experiment.csv')
+df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa_generalization/deep_sa_experiment.csv')
 # 
 # df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa_generalization/deep_sa_experiment.csv')
 
@@ -35,14 +35,14 @@ fig = plt.figure()
 plot_num = 0
 
 
-for i, bs in enumerate(df.train_batch_size.unique()):
+for i, bs in enumerate(df.batch_size.unique()):
 
     # print(df.loc[df['thread_count'] == tc])
 
     # Create scatter axis here.
     plot_num += 1
 
-    ax = fig.add_subplot(len(df.train_batch_size.unique()),
+    ax = fig.add_subplot(len(df.batch_size.unique()),
                          1,
                          plot_num)
 
@@ -51,7 +51,7 @@ for i, bs in enumerate(df.train_batch_size.unique()):
 
     for k, opt in enumerate(df.optimizer.unique()):
 
-        run_df = df.loc[(df['train_batch_size'] == bs) &
+        run_df = df.loc[(df['batch_size'] == bs) &
                         (df['optimizer'] == opt)]
 
         # print(run_df)
@@ -75,7 +75,7 @@ for i, bs in enumerate(df.train_batch_size.unique()):
         # row_annotation = 'Thread \n Count = %d' % tc
 
         # Create axes
-        # ax.loglog()
+        ax.loglog()
         ax.scatter(train_loss, val_loss, label=opt)
 
     pad = -70
