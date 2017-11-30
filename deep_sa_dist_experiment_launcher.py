@@ -147,6 +147,14 @@ def main(FLAGS):
 
             job_complete_flags.append(job_complete)
 
+            if job_complete:
+
+                p = subprocess.Popen('qdel -Wforce ' + job_id,
+                                 stdin=subprocess.PIPE,
+                                 stdout=subprocess.PIPE,
+                                 shell=True)
+
+
         # And the job complete flags together.
         jobs_complete = (all(job_complete_flags))
 
