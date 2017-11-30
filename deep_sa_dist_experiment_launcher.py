@@ -23,7 +23,7 @@ def main(FLAGS):
     tf.gfile.MakeDirs(FLAGS.log_dir)
 
     # Declare experimental flags.
-    exp_design = [('rep_num', range(5)),
+    exp_design = [('rep_num', range(2)),
                   ('train_batch_size', [128, 256]),
                   ('optimizer', ['sgd',
                                  'layerwise_fsa_annealer',
@@ -130,8 +130,6 @@ def main(FLAGS):
                                  shell=True)
 
             output = p.communicate()
-
-            print(output)
 
             try:
                 # Read the qstat stdout, parse the state, and conv to Boolean.
