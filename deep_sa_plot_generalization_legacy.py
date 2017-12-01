@@ -10,7 +10,7 @@ from mpl_toolkits.axes_grid1 import Grid
 
 plt.style.use('ggplot')
 
-df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa_generalization/deep_sa_experiment.csv')
+df = pd.read_csv('C:/Users/Justi/Research/log/sa/sa_generalization_out.csv')
 # 
 # df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa_generalization/deep_sa_experiment.csv')
 

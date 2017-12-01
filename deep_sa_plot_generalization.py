@@ -75,7 +75,7 @@ for i, bs in enumerate(df.train_batch_size.unique()):
         # row_annotation = 'Thread \n Count = %d' % tc
 
         # Create axes
-        # ax.loglog()
+        ax.loglog()
         ax.scatter(train_loss, val_loss, label=opt)
 
     pad = -70
