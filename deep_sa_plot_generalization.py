@@ -39,52 +39,74 @@ for i, bs in enumerate(df.train_batch_size.unique()):
 
     # print(df.loc[df['thread_count'] == tc])
 
-    # Create scatter axis here.
-    plot_num += 1
 
-    ax = fig.add_subplot(len(df.train_batch_size.unique()),
-                         1,
-                         plot_num)
 
-    # ax.set_xlim(0.001, 1000)
-    # ax.set_ylim(0.1, 1000)
+    for j, opt in enumerate(df.optimizer.unique()):
 
-    for k, opt in enumerate(df.optimizer.unique()):
+        # Create scatter axis here.
+        plot_num += 1
 
-        run_df = df.loc[(df['train_batch_size'] == bs) &
-                        (df['optimizer'] == opt)]
+        ax = fig.add_subplot(len(df.train_batch_size.unique()),
+                             len(df.optimizer.unique()),
+                             plot_num)
 
-        # print(run_df)
-        # Create some mock data
 
-        # mean_val_loss = run_df.groupby([''])['val_loss'].mean()
+        # ax.set_xlim(0.00001, 10)
+        ax.set_ylim(1e-7, 10)
 
-        train_loss = run_df['train_loss']
-        val_loss = run_df['val_loss']
+        for l, init_temp in enumerate(df.init_temp.unique()):
 
-        # print(len(train_loss))
-        # print(len(mean_val_loss))
-        # show_xlabel = len(df.thread_count.unique()) == (i + 1)
-        # show_label_1 = j == 0
-        # show_label_2 = len(df.batch_size.unique()) == (j + 1)
+            run_df = df.loc[(df['train_batch_size'] == bs) &
+                            (df['optimizer'] == opt) &
+                            (df['init_temp'] == init_temp)]
 
-        # annotate_col = i == 0
-        # col_annotation = 'Batch Size = %d' % bs
+            # print(run_df)
+            # Create some mock data
 
-        # annotate_row = j == 0
-        # row_annotation = 'Thread \n Count = %d' % tc
+            # mean_val_loss = run_df.groupby([''])['val_loss'].mean()
 
-        # Create axes
-        ax.loglog()
-        ax.scatter(train_loss, val_loss, label=opt)
+            train_loss = run_df['train_loss']
+            train_loss = run_df.groupby(['step_num'])['train_loss'].mean().tolist()
+            # val_loss = run_df['val_loss']
+            # print(val_loss)
+            val_loss = run_df.groupby(['step_num'])['val_loss'].mean().tolist()
+            print(len(val_loss))
+            # val_loss = (run_df['val_loss'].groupby(run_df['step_num']).mean())
+            # print(val_loss)
+
+            step = run_df['step_num']
+            step = run_df.groupby(['step_num'])['step_num'].mean().tolist()
+            print(len(step))
+            # print(step)
+
+            # print(len(train_loss))
+            # print(len(mean_val_loss))
+            # show_xlabel = len(df.thread_count.unique()) == (i + 1)
+            # show_label_1 = j == 0
+            # show_label_2 = len(df.batch_size.unique()) == (j + 1)
+
+            # annotate_col = i == 0
+            # col_annotation = 'Batch Size = %d' % bs
+
+            # annotate_row = j == 0
+            # row_annotation = 'Thread \n Count = %d' % tc
+
+            # Create axes
+            ax.loglog()
+            # ax.scatter(train_loss, val_loss, label=opt)
+            ax.plot(step, train_loss, '--', label=opt)
+            ax.plot(step, val_loss, label=opt)
+
+            ax.set_yscale("log", nonposx='clip')
+
+            ax.legend()
+
 
     pad = -70
     ax.annotate(str(bs), xy=(0, 0.75), xytext=(pad, 0),
                 rotation=90,
                 xycoords='axes fraction', textcoords='offset points',
                 size='large', ha='center', va='baseline')
-    ax.legend()
-
 plt.suptitle("Generalization and Training Loss of SGD and SA by Training Set Size")
 
 plt.show()

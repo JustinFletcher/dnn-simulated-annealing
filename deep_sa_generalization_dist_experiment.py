@@ -36,7 +36,9 @@ def deep_sa_experiment():
     # Declare experimental measurement vars.
     steps = []
     val_losses = []
+    val_errors = []
     train_losses = []
+    train_errors = []
     mean_running_times = []
 
     print("------------model_output-------------")
@@ -109,15 +111,15 @@ def deep_sa_experiment():
             if sv.should_stop():
                 break
 
+            # Hack the start time.
+            start_time = time.time()
+
             # If it is a batch refresh interval, refresh the batch.
             if((i % FLAGS.batch_interval == 0) or (i == 0)):
 
                 # Update the batch.
                 train_images, train_labels = sess.run([image_batch,
                                                        label_batch])
-
-            # Hack the start time.
-            start_time = time.time()
 
             # Make a dict to load the batch onto the placeholders.
             train_dict = {model.stimulus_placeholder: train_images,
@@ -153,7 +155,7 @@ def deep_sa_experiment():
             running_times.append(optimize_step_running_time)
 
             # If we have reached a testing interval, test.
-            if i % FLAGS.test_interval == 1:
+            if (i % FLAGS.test_interval == 0):
 
                 # Update the batch, so as to not underestimate the train error.
                 # train_images, train_labels = sess.run([image_batch,
@@ -165,10 +167,10 @@ def deep_sa_experiment():
                               model.keep_prob: 1.0}
 
                 # Compute error over the training set.
-                train_error = sess.run(model.error, train_dict)
+                train_error = sess.run(model.error, feed_dict=train_dict)
 
                 # Compute loss over the training set.
-                train_loss = sess.run(model.loss, train_dict)
+                train_loss = sess.run(model.loss, feed_dict=train_dict)
 
                 # Make a dict to load the val batch onto the placeholders.
                 val_dict = {model.stimulus_placeholder: val_images,
@@ -176,15 +178,17 @@ def deep_sa_experiment():
                             model.keep_prob: 1.0}
 
                 # Compute error over the validation set.
-                val_error = sess.run(model.error, val_dict)
+                val_error = sess.run(model.error, feed_dict=val_dict)
 
                 # Compute loss over the validation set.
-                val_loss = sess.run(model.loss, val_dict)
+                val_loss = sess.run(model.loss, feed_dict=val_dict)
 
                 # Store the data we wish to manually report.
                 steps.append(i)
                 train_losses.append(train_loss)
+                train_errors.append(train_error)
                 val_losses.append(val_loss)
+                val_errors.append(val_error)
                 mean_running_times.append(np.mean(running_times))
 
                 # Print relevant values.
@@ -210,15 +214,19 @@ def deep_sa_experiment():
         csvwriter = csv.writer(csvfile)
 
         # Iterate over the results vectors for each config.
-        for (step, tl, vl, mrt) in zip(steps,
-                                       train_losses,
-                                       val_losses,
-                                       mean_running_times):
+        for (step, tl, te, vl, ve, mrt) in zip(steps,
+                                               train_losses,
+                                               train_errors,
+                                               val_losses,
+                                               val_errors,
+                                               mean_running_times):
 
             # Write the data to a csv.
             csvwriter.writerow([step,
                                 tl,
+                                te,
                                 vl,
+                                ve,
                                 mrt])
 
     return([steps, train_losses, val_losses, mean_running_times])
@@ -245,7 +253,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_steps', type=int, default=10000,
                         help='Number of steps to run trainer.')
 
-    parser.add_argument('--test_interval', type=int, default=100,
+    parser.add_argument('--test_interval', type=int, default=50,
                         help='Number of steps between test set evaluations.')
 
     parser.add_argument('--learning_rate', type=float, default=1e-4,

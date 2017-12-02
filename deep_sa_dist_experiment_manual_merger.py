@@ -17,11 +17,12 @@ import tensorflow as tf
 def main(FLAGS):
 
     # Declare experimental flags.
-    exp_design = [('rep_num', range(2)),
+    exp_design = [('rep_num', range(4)),
                   ('train_batch_size', [128, 2048, 16384]),
                   ('optimizer', ['sgd',
                                  'layerwise_fsa_annealer',
-                                 'fsa_annealer'])]
+                                 'fsa_annealer']),
+                  ('init_temp' , [1.0, 6.0])]
 
     # Translate the design structure into flag strings.
     exp_flag_strings = [['--' + f + '=' + str(v) for v in r]
