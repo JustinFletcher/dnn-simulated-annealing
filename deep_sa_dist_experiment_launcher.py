@@ -176,7 +176,9 @@ def main(FLAGS):
         # Manually note response varaibles (MUST: Couple with experiment).
         response_labels = ['step_num',
                            'train_loss',
+                           'train_error',
                            'val_loss',
+                           'val_error',
                            'mean_running_time']
 
         # Join lists.
