@@ -22,7 +22,7 @@ def main(FLAGS):
                   ('optimizer', ['sgd',
                                  'layerwise_fsa_annealer',
                                  'fsa_annealer']),
-                  ('init_temp' , [1.0, 6.0])]
+                  ('init_temp', [1.0, 6.0])]
 
     # Translate the design structure into flag strings.
     exp_flag_strings = [['--' + f + '=' + str(v) for v in r]
@@ -32,7 +32,6 @@ def main(FLAGS):
     experimental_configs = itertools.product(*exp_flag_strings)
 
     # Make a list to store job id strings.
-    job_ids = []
     input_output_maps = []
 
     # Iterate over each experimental configuration, launching a job for each.
@@ -42,26 +41,14 @@ def main(FLAGS):
         print(experimental_config)
         print("---------------------------------------")
 
-        # Customize your options here.
- 
         # Add a final flag modifying the log filename to be unique.
         log_filename = 'templog' + str(i)
-
-
-        # log_filenames.append(log_filename)
 
         # Build IO maps.
         input_output_map = (experimental_config, log_filename)
         input_output_maps.append(input_output_map)
 
         print("-----------------")
-
-    jobs_complete = False
-    timeout = False
-    elapsed_time = 0
-
-
-    print("All jobs complete. Merging results.")
 
     # Accomodate Python 3+
     with open(FLAGS.log_dir + '/' + FLAGS.log_filename, 'w') as csvfile:
@@ -75,14 +62,13 @@ def main(FLAGS):
         # Manually note response varaibles (MUST: Couple with experiment).
         response_labels = ['step_num',
                            'train_loss',
+                           'train_error',
                            'val_loss',
+                           'val_error',
                            'mean_running_time']
-
         # Join lists.
         headers = parameter_labels + response_labels
 
-
-        print(headers)
         # Open a writer and write the header.
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(headers)
@@ -98,9 +84,9 @@ def main(FLAGS):
                 flag_val = flag.split('=')[1]
 
                 input_row.append(flag_val)
-            
+
             try:
-                
+
                 with open(FLAGS.log_dir + '/' + output_filename, 'r') as f:
 
                     reader = csv.reader(f)
