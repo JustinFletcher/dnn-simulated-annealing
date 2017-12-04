@@ -17,7 +17,7 @@ import tensorflow as tf
 def main(FLAGS):
 
     # Declare experimental flags.
-    exp_design = [('rep_num', range(10)),
+    exp_design = [('rep_num', range(2)),
                   ('train_batch_size', [128, 2048, 16384]),
                   ('optimizer', ['sgd',
                                  'fsa_annealer',
@@ -44,8 +44,10 @@ def main(FLAGS):
         # Add a final flag modifying the log filename to be unique.
         log_filename = 'templog' + str(i)
 
+        temp_log_dir = FLAGS.log_dir + 'templog' + str(i) + '/'
+
         # Build IO maps.
-        input_output_map = (experimental_config, log_filename)
+        input_output_map = (experimental_config, temp_log_dir + log_filename)
         input_output_maps.append(input_output_map)
 
         print("-----------------")
@@ -87,7 +89,7 @@ def main(FLAGS):
 
             try:
 
-                with open(FLAGS.log_dir + '/' + output_filename, 'r') as f:
+                with open( output_filename, 'r') as f:
 
                     reader = csv.reader(f)
 
@@ -105,7 +107,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--log_dir', type=str,
-                        default='C:/Users/Justi/Research/log/deep_sa_generalization_dist_experiment',
+                        default='C:/Users/Justi/Research/log/deep_sa_generalization_dist_experiment/',
                         help='Summaries log directory.')
 
     parser.add_argument('--log_filename', type=str,

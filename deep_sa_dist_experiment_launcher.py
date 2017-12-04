@@ -23,12 +23,12 @@ def main(FLAGS):
     tf.gfile.MakeDirs(FLAGS.log_dir)
 
     # Declare experimental flags.
-    exp_design = [('rep_num', range(2)),
+    exp_design = [('rep_num', range(10)),
                   ('train_batch_size', [128, 2048, 16384]),
                   ('optimizer', ['sgd',
                                  'fsa_annealer',
                                  'layerwise_fsa_annealer']),
-                  ('init_temp' , [1.0, 6.0])]
+                  ('init_temp', [1.0, 10.0])]
 
     # Translate the design structure into flag strings.
     exp_flag_strings = [['--' + f + '=' + str(v) for v in r]
@@ -202,7 +202,7 @@ def main(FLAGS):
 
                 input_row.append(flag_val)
 
-            with open(FLAGS.log_dir + '/' + output_filename, 'rb') as f:
+            with open(output_filename, 'rb') as f:
 
                 reader = csv.reader(f)
 

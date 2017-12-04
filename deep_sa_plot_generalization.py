@@ -52,7 +52,7 @@ for i, bs in enumerate(df.train_batch_size.unique()):
 
 
         # ax.set_xlim(0.00001, 10)
-        ax.set_ylim(0, 1)
+        ax.set_ylim(0, 10)
 
         for l, init_temp in enumerate(df.init_temp.unique()):
 
@@ -70,14 +70,13 @@ for i, bs in enumerate(df.train_batch_size.unique()):
             # val_loss = run_df['val_loss']
             # print(val_loss)
             val_loss = run_df.groupby(['step_num'])['val_loss'].mean().tolist()
-            train_loss = run_df.groupby(['step_num'])['train_error'].mean().tolist()
+            # train_loss = run_df.groupby(['step_num'])['train_error'].mean().tolist()
             # val_loss = run_df['val_loss']
             # print(val_loss)
-            val_loss = run_df.groupby(['step_num'])['val_error'].mean().tolist()
+            # val_loss = run_df.groupby(['step_num'])['val_error'].mean().tolist()
             print(len(val_loss))
             # val_loss = (run_df['val_loss'].groupby(run_df['step_num']).mean())
             # print(val_loss)
-
 
             # val_loss = run_df['val_error']
             # train_loss = run_df['train_error']
@@ -104,8 +103,8 @@ for i, bs in enumerate(df.train_batch_size.unique()):
             # ax.scatter(train_loss, val_loss, label=opt)
             # ax.plot(step, train_loss, '--', label=opt)
             # ax.plot(step, val_loss, label=opt)
-            ax.scatter(step, train_loss, label=opt+str(init_temp)+'_train', alpha=0.5)
-            ax.scatter(step, val_loss, label=opt+str(init_temp)+'val', alpha=0.5)
+            ax.plot(step, train_loss, '--', label=opt+str(init_temp)+'_train', alpha=0.5)
+            ax.plot(step, val_loss, label=opt+str(init_temp)+'val', alpha=0.5)
 
             # ax.set_yscale("log", nonposx='clip')
 
