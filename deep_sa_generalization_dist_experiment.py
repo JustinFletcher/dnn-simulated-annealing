@@ -43,9 +43,14 @@ def deep_sa_experiment():
 
     print("------------model_output-------------")
     # Instantiate a model.
-    model = Model(FLAGS.input_size, FLAGS.label_size, FLAGS.learning_rate,
-                  FLAGS.train_enqueue_threads, FLAGS.val_enqueue_threads,
-                  FLAGS.data_dir, FLAGS.train_file, FLAGS.validation_file)
+    model = Model(FLAGS.input_size,
+                  FLAGS.label_size,
+                  FLAGS.learning_rate,
+                  FLAGS.train_enqueue_threads,
+                  FLAGS.val_enqueue_threads,
+                  FLAGS.data_dir,
+                  FLAGS.train_file,
+                  FLAGS.validation_file)
     print("-------------------------------------")
 
     # Instantiate TensorFlow  annealing objects.
@@ -191,8 +196,7 @@ def deep_sa_experiment():
             # train_writer.add_summary(summary, i)
 
             # Update timekeeping variables.
-            stop_time = time.time()
-            optimize_step_running_time = stop_time - start_time
+            optimize_step_running_time = time.time() - start_time
             running_times.append(optimize_step_running_time)
 
         print("----------------------------------------")
@@ -244,10 +248,10 @@ if __name__ == '__main__':
 
     # Establish default arguements.
 
-    parser.add_argument('--max_steps', type=int, default=10000,
+    parser.add_argument('--max_steps', type=int, default=1000,
                         help='Number of steps to run trainer.')
 
-    parser.add_argument('--test_interval', type=int, default=50,
+    parser.add_argument('--test_interval', type=int, default=100,
                         help='Number of steps between test set evaluations.')
 
     parser.add_argument('--learning_rate', type=float, default=1e-4,
