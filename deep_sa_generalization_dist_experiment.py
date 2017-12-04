@@ -326,7 +326,7 @@ if __name__ == '__main__':
                         help='Interval between training batch refresh.')
 
     parser.add_argument('--optimizer', type=str,
-                        default='fsa_annealer',
+                        default='sgd',
                         help='Optimizer to use.')
 
     # Parse known arguements.
