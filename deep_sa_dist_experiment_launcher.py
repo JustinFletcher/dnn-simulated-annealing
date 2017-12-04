@@ -68,16 +68,18 @@ def main(FLAGS):
         # Add a final flag modifying the log filename to be unique.
         log_filename = 'templog' + str(i)
 
+        temp_log_dir = FLAGS.log_dir + '/templog' + str(i) +'/'
+
+        command += '--log_dir' + temp_log_dir
+
         # Add the logfile to the command.
         command += ' --log_filename=' + log_filename
 
         # log_filenames.append(log_filename)
 
         # Build IO maps.
-        input_output_map = (experimental_config, log_filename)
+        input_output_map = (experimental_config, temp_log_dir + log_filename)
         input_output_maps.append(input_output_map)
-
-        command += ' --log_dir=' + FLAGS.log_dir
 
         # Build the job sting.
         job_string = """#!/bin/bash
