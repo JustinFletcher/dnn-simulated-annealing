@@ -117,6 +117,8 @@ def deep_sa_experiment():
                     model.target_placeholder: val_labels,
                     model.keep_prob: 1.0}
 
+        sess.run(sess.run(model.error, feed_dict=val_dict))
+
         # Iterate until max steps.
         for i in range(FLAGS.max_steps):
 
