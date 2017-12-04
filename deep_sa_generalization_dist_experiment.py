@@ -88,12 +88,15 @@ def deep_sa_experiment():
         tf_cost_evaluator.start(sess=sess)
 
         # Instantiate an Annealer that, when called, increments the annealing.
-        annealer = Annealer(tf_state, tf_perturber, tf_cost_evaluator,
-                            fsa_temperature, fsa_acceptance_probability,
+        annealer = Annealer(tf_state,
+                            tf_perturber,
+                            tf_cost_evaluator,
+                            fsa_temperature,
+                            fsa_acceptance_probability,
                             FLAGS.init_temp)
 
         # Declare timekeeping vars.
-        running_times = []
+        running_times = [0]
         optimize_step_running_time = 0
 
         print("------------training_output-------------")
@@ -104,15 +107,17 @@ def deep_sa_experiment():
         # Load the validation set batch into memory.
         val_images, val_labels = sess.run([val_image_batch, val_label_batch])
 
+        # Make a dict to load the val batch onto the placeholders.
+        val_dict = {model.stimulus_placeholder: val_images,
+                    model.target_placeholder: val_labels,
+                    model.keep_prob: 1.0}
+
         # Iterate until max steps.
         for i in range(FLAGS.max_steps):
 
             # Check for break.
             if sv.should_stop():
                 break
-
-            # Hack the start time.
-            start_time = time.time()
 
             # If it is a batch refresh interval, refresh the batch.
             if((i % FLAGS.batch_interval == 0) or (i == 0)):
@@ -125,6 +130,42 @@ def deep_sa_experiment():
             train_dict = {model.stimulus_placeholder: train_images,
                           model.target_placeholder: train_labels,
                           model.keep_prob: FLAGS.keep_prob}
+
+            # If we have reached a testing interval, test.
+            if (i % FLAGS.test_interval == 0):
+
+                # Compute error over the training set.
+                train_error = sess.run(model.error, feed_dict=train_dict)
+
+                # Compute loss over the training set.
+                train_loss = sess.run(model.loss, feed_dict=train_dict)
+
+                # Compute error over the validation set.
+                val_error = sess.run(model.error, feed_dict=val_dict)
+
+                # Compute loss over the validation set.
+                val_loss = sess.run(model.loss, feed_dict=val_dict)
+
+                # Store the data we wish to manually report.
+                steps.append(i)
+                train_losses.append(train_loss)
+                train_errors.append(train_error)
+                val_losses.append(val_loss)
+                val_errors.append(val_error)
+                mean_running_times.append(np.mean(running_times))
+
+                # Print relevant values.
+                print('%d | %.6f | %.2f | %.6f | %.2f | %.6f | %.2f'
+                      % (i,
+                         train_loss,
+                         train_error,
+                         val_loss,
+                         val_error,
+                         np.mean(running_times),
+                         np.sum(running_times)))
+
+            # Hack the start time.
+            start_time = time.time()
 
             if FLAGS.optimizer == 'layerwise_fsa_annealer':
 
@@ -153,53 +194,6 @@ def deep_sa_experiment():
             stop_time = time.time()
             optimize_step_running_time = stop_time - start_time
             running_times.append(optimize_step_running_time)
-
-            # If we have reached a testing interval, test.
-            if (i % FLAGS.test_interval == 0):
-
-                # Update the batch, so as to not underestimate the train error.
-                # train_images, train_labels = sess.run([image_batch,
-                #                                        label_batch])
-
-                # Make a dict to load the batch onto the placeholders.
-                train_dict = {model.stimulus_placeholder: train_images,
-                              model.target_placeholder: train_labels,
-                              model.keep_prob: 1.0}
-
-                # Compute error over the training set.
-                train_error = sess.run(model.error, feed_dict=train_dict)
-
-                # Compute loss over the training set.
-                train_loss = sess.run(model.loss, feed_dict=train_dict)
-
-                # Make a dict to load the val batch onto the placeholders.
-                val_dict = {model.stimulus_placeholder: val_images,
-                            model.target_placeholder: val_labels,
-                            model.keep_prob: 1.0}
-
-                # Compute error over the validation set.
-                val_error = sess.run(model.error, feed_dict=val_dict)
-
-                # Compute loss over the validation set.
-                val_loss = sess.run(model.loss, feed_dict=val_dict)
-
-                # Store the data we wish to manually report.
-                steps.append(i)
-                train_losses.append(train_loss)
-                train_errors.append(train_error)
-                val_losses.append(val_loss)
-                val_errors.append(val_error)
-                mean_running_times.append(np.mean(running_times))
-
-                # Print relevant values.
-                print('%d | %.6f | %.2f | %.6f | %.2f | %.6f | %.2f'
-                      % (i,
-                         train_loss,
-                         train_error,
-                         val_loss,
-                         val_error,
-                         np.mean(running_times),
-                         np.sum(running_times)))
 
         print("----------------------------------------")
         # Close the summary writers.
