@@ -68,7 +68,7 @@ def main(FLAGS):
         # Add a final flag modifying the log filename to be unique.
         log_filename = 'templog' + str(i)
 
-        temp_log_dir = FLAGS.log_dir + '/templog' + str(i) +'/'
+        temp_log_dir = FLAGS.log_dir + '/templog' + str(i) + '/'
 
         command += '--log_dir' + temp_log_dir
 

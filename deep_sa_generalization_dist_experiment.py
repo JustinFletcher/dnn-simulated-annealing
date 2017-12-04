@@ -27,6 +27,11 @@ from tfacceptance import *
 
 def deep_sa_experiment():
 
+    if tf.gfile.Exists(FLAGS.log_dir):
+
+        tf.gfile.DeleteRecursively(FLAGS.log_dir)
+
+    tf.gfile.MakeDirs(FLAGS.log_dir)
     # # Unpack the experimental parameters.
     # (optimizer, batch_size, rep) = exp_parameters
 
@@ -264,7 +269,7 @@ if __name__ == '__main__':
                         help='Directory from which to pull data.')
 
     parser.add_argument('--log_dir', type=str,
-                        default='../log/deep_sa_generalization/',
+                        default='../log/deep_sa_generalization/templog',
                         help='Summaries log directory.')
 
     parser.add_argument('--val_batch_size', type=int,
