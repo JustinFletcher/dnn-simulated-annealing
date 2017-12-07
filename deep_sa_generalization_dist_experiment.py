@@ -94,7 +94,7 @@ def deep_sa_experiment():
     else:
 
         print("That is not a valid optimizer.")
-        break
+        exit()
 
     # Get input data.
     image_batch, label_batch = model.get_train_batch_ops(
@@ -244,7 +244,7 @@ def deep_sa_experiment():
             else:
 
                 print("That is not a valid optimizer.")
-                break
+                exit()
 
             # train_writer.add_summary(summary, i)
 
