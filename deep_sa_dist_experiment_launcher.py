@@ -23,12 +23,14 @@ def main(FLAGS):
     tf.gfile.MakeDirs(FLAGS.log_dir)
 
     # Declare experimental flags.
-    exp_design = [('rep_num', range(10)),
-                  ('train_batch_size', [128, 2048, 16384]),
-                  ('optimizer', ['sgd',
+    exp_design = [('rep_num', range(2)),
+                  ('train_batch_size', [128, 2048, 4096]),
+                  ('optimizer', ['csa_annealer',
                                  'fsa_annealer',
-                                 'layerwise_fsa_annealer']),
-                  ('init_temp', [1.0, 10.0])]
+                                 'gsa_annealer',
+                                 'layerwise_csa_annealer',
+                                 'layerwise_fsa_annealer',
+                                 'layerwise_gsa_annealer'])]
 
     # Translate the design structure into flag strings.
     exp_flag_strings = [['--' + f + '=' + str(v) for v in r]
@@ -56,7 +58,7 @@ def main(FLAGS):
 
         # Customize your options here.
         job_name = "dist_ex_%d" % i
-        walltime = "1:00:00"
+        walltime = "4:00:00"
         select = "1:ncpus=20:mpiprocs=20"
         command = "python " + FLAGS.experiment_py_file
 

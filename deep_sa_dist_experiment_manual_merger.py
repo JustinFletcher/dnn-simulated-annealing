@@ -3,12 +3,8 @@
 # Example PBS cluster job submission in Python
 
 import csv
-import time
 import argparse
 import itertools
-import subprocess
-import tensorflow as tf
-
 # If you want to be emailed by the system, include these in job_string:
 #PBS -M your_email@address
 #PBS -m abe  # (a = abort, b = begin, e = end)
@@ -17,12 +13,12 @@ import tensorflow as tf
 def main(FLAGS):
 
     # Declare experimental flags.
-    exp_design = [('rep_num', range(2)),
+    exp_design = [('rep_num', range(10)),
                   ('train_batch_size', [128, 2048, 16384]),
                   ('optimizer', ['sgd',
                                  'fsa_annealer',
                                  'layerwise_fsa_annealer']),
-                  ('init_temp', [1.0, 6.0])]
+                  ('init_temp', [1.0, 10.0])]
 
     # Translate the design structure into flag strings.
     exp_flag_strings = [['--' + f + '=' + str(v) for v in r]

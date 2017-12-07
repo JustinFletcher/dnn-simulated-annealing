@@ -11,7 +11,6 @@ from mpl_toolkits.axes_grid1 import Grid
 plt.style.use('ggplot')
 
 df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa_generalization_dist_experiment/deep_sa_generalization_dist_experiment.csv')
-# 
 # df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa_generalization/deep_sa_experiment.csv')
 
 # max_running_time = np.max(df.running_time)
@@ -52,7 +51,7 @@ for i, bs in enumerate(df.train_batch_size.unique()):
 
 
         # ax.set_xlim(0.00001, 10)
-        ax.set_ylim(0, 10)
+        ax.set_ylim(0, 1)
 
         for l, init_temp in enumerate(df.init_temp.unique()):
 
@@ -70,10 +69,10 @@ for i, bs in enumerate(df.train_batch_size.unique()):
             # val_loss = run_df['val_loss']
             # print(val_loss)
             val_loss = run_df.groupby(['step_num'])['val_loss'].mean().tolist()
-            # train_loss = run_df.groupby(['step_num'])['train_error'].mean().tolist()
+            train_loss = run_df.groupby(['step_num'])['train_error'].mean().tolist()
             # val_loss = run_df['val_loss']
             # print(val_loss)
-            # val_loss = run_df.groupby(['step_num'])['val_error'].mean().tolist()
+            val_loss = run_df.groupby(['step_num'])['val_error'].mean().tolist()
             print(len(val_loss))
             # val_loss = (run_df['val_loss'].groupby(run_df['step_num']).mean())
             # print(val_loss)

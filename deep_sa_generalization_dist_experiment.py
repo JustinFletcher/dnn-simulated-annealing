@@ -10,6 +10,7 @@ import itertools
 import functools
 import numpy as np
 import tensorflow as tf
+from shutil import copyfile
 
 sys.path.append("../tensorflow-zoo")
 from baseline_model import *
@@ -62,13 +63,29 @@ def deep_sa_experiment():
     tf_state = TensorFlowState()
     tf_cost_evaluator = TensorFlowCostEvaluator(model.loss)
 
-    if FLAGS.optimizer == 'layerwise_fsa_annealer':
+    if FLAGS.optimizer == 'csa_annealer':
 
-        tf_perturber = TensorFlowPerturberLayerwiseFSA(FLAGS.learning_rate)
+        tf_perturber = CSATensorFlowPerturber(FLAGS.learning_rate)
 
     elif FLAGS.optimizer == 'fsa_annealer':
 
-        tf_perturber = TensorFlowPerturberFSA(FLAGS.learning_rate)
+        tf_perturber = FSATensorFlowPerturber(FLAGS.learning_rate)
+
+    elif FLAGS.optimizer == 'gsa_annealer':
+
+        tf_perturber = GSATensorFlowPerturber(FLAGS.learning_rate)
+
+    elif FLAGS.optimizer == 'layerwise_gsa_annealer':
+
+        tf_perturber = LayerwiseCSATensorFlowPerturber(FLAGS.learning_rate)
+
+    elif FLAGS.optimizer == 'layerwise_fsa_annealer':
+
+        tf_perturber = LayerwiseFSATensorFlowPerturber(FLAGS.learning_rate)
+
+    elif FLAGS.optimizer == 'layerwise_gsa_annealer':
+
+        tf_perturber = LayerwiseGSATensorFlowPerturber(FLAGS.learning_rate)
 
     else:
 
@@ -85,7 +102,7 @@ def deep_sa_experiment():
     tf.summary.merge_all()
 
     # Instantiate a session and initialize it.
-    sv = tf.train.Supervisor(logdir=FLAGS.log_dir, save_summaries_secs=100.0)
+    sv = tf.train.Supervisor(logdir=FLAGS.log_dir, save_summaries_secs=600.0)
 
     with sv.managed_session() as sess:
 
@@ -179,7 +196,19 @@ def deep_sa_experiment():
             # Hack the start time.
             start_time = time.time()
 
-            if FLAGS.optimizer == 'layerwise_fsa_annealer':
+            if FLAGS.optimizer == 'csa_annealer':
+
+                annealer(input_data=train_dict)
+
+            elif FLAGS.optimizer == 'fsa_annealer':
+
+                annealer(input_data=train_dict)
+
+            elif FLAGS.optimizer == 'gsa_annealer':
+
+                annealer(input_data=train_dict)
+
+            elif FLAGS.optimizer == 'layerwise_fsa_annealer':
 
                 tv_count = len(tf.trainable_variables())
 
@@ -187,9 +216,21 @@ def deep_sa_experiment():
 
                 annealer(perturb_params=perturb_params, input_data=train_dict)
 
-            elif FLAGS.optimizer == 'fsa_annealer':
+            elif FLAGS.optimizer == 'layerwise_fsa_annealer':
 
-                annealer(input_data=train_dict)
+                tv_count = len(tf.trainable_variables())
+
+                perturb_params = random.choice(range(tv_count))
+
+                annealer(perturb_params=perturb_params, input_data=train_dict)
+
+            elif FLAGS.optimizer == 'layerwise_fsa_annealer':
+
+                tv_count = len(tf.trainable_variables())
+
+                perturb_params = random.choice(range(tv_count))
+
+                annealer(perturb_params=perturb_params, input_data=train_dict)
 
             elif FLAGS.optimizer == 'sgd':
 
@@ -233,6 +274,10 @@ def deep_sa_experiment():
                                 vl,
                                 ve,
                                 mrt])
+    copyfile(FLAGS.log_dir + '/' + FLAGS.log_filename,
+             FLAGS.log_dir + '/../' + FLAGS.log_filename)
+
+    # TODO: Copy logfile up one directory.
 
     return([steps, train_losses, val_losses, mean_running_times])
 
@@ -255,7 +300,7 @@ if __name__ == '__main__':
 
     # Establish default arguements.
 
-    parser.add_argument('--max_steps', type=int, default=20000,
+    parser.add_argument('--max_steps', type=int, default=1000,
                         help='Number of steps to run trainer.')
 
     parser.add_argument('--test_interval', type=int, default=100,
@@ -309,7 +354,7 @@ if __name__ == '__main__':
                         help='Keep probability for output layer dropout.')
 
     parser.add_argument('--init_temp', type=float,
-                        default=1.0,
+                        default=5.0,
                         help='Initial temperature for SA algorithm')
 
     parser.add_argument('--rep_num', type=int,
