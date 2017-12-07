@@ -75,7 +75,7 @@ def deep_sa_experiment():
 
         tf_perturber = GSATensorFlowPerturber(FLAGS.learning_rate)
 
-    elif FLAGS.optimizer == 'layerwise_gsa_annealer':
+    elif FLAGS.optimizer == 'layerwise_csa_annealer':
 
         tf_perturber = LayerwiseCSATensorFlowPerturber(FLAGS.learning_rate)
 
@@ -87,9 +87,14 @@ def deep_sa_experiment():
 
         tf_perturber = LayerwiseGSATensorFlowPerturber(FLAGS.learning_rate)
 
+    elif FLAGS.optimizer == 'sgd':
+
+        tf_perturber = []
+
     else:
 
-        tf_perturber = TensorFlowPerturberFSA(FLAGS.learning_rate)
+        print("That is not a valid optimizer.")
+        break
 
     # Get input data.
     image_batch, label_batch = model.get_train_batch_ops(
