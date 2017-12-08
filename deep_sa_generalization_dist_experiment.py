@@ -280,7 +280,7 @@ def deep_sa_experiment():
                                 ve,
                                 mrt])
     copyfile(FLAGS.log_dir + '/' + FLAGS.log_filename,
-             FLAGS.log_dir + '/../' + FLAGS.log_filename)
+             FLAGS.log_dir + '/../')
 
     # TODO: Copy logfile up one directory.
 
