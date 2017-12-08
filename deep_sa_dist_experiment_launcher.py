@@ -23,14 +23,15 @@ def main(FLAGS):
     tf.gfile.MakeDirs(FLAGS.log_dir)
 
     # Declare experimental flags.
-    exp_design = [('rep_num', range(2)),
+    exp_design = [('rep_num', range(10)),
                   ('train_batch_size', [128, 2048, 4096]),
                   ('optimizer', ['csa_annealer',
                                  'fsa_annealer',
                                  'gsa_annealer',
                                  'layerwise_csa_annealer',
                                  'layerwise_fsa_annealer',
-                                 'layerwise_gsa_annealer'])]
+                                 'layerwise_gsa_annealer']),
+                  ('learning_rate', [1e-4, 1e-5])]
 
     # Translate the design structure into flag strings.
     exp_flag_strings = [['--' + f + '=' + str(v) for v in r]
@@ -117,7 +118,7 @@ def main(FLAGS):
 
         print('Time elapsed: ' + str(elapsed_time) + ' seconds.')
 
-        time.sleep(1)
+        time.sleep(5)
 
         elapsed_time += 1
 
@@ -167,6 +168,8 @@ def main(FLAGS):
         print("-----------------")
 
     print("All jobs complete. Merging results.")
+
+    time.sleep(5)
 
     # # Accomodate Python 3+
     # with open(FLAGS.log_dir '/' + FLAGS.log_filename, 'w') as csvfile:
