@@ -221,7 +221,7 @@ def deep_sa_experiment():
 
                 annealer(perturb_params=perturb_params, input_data=train_dict)
 
-            elif FLAGS.optimizer == 'layerwise_csa_annealer':
+            elif FLAGS.optimizer == 'layerwise_fsa_annealer':
 
                 tv_count = len(tf.trainable_variables())
 
