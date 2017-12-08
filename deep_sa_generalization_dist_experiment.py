@@ -73,7 +73,7 @@ def deep_sa_experiment():
 
     elif FLAGS.optimizer == 'gsa_annealer':
 
-        tf_perturber = GSATensorFlowPerturber(FLAGS.learning_rate)
+        tf_perturber = GSATensorFlowPerturber(FLAGS.learning_rate, FLAGS.gsa_q)
 
     elif FLAGS.optimizer == 'layerwise_csa_annealer':
 
@@ -85,7 +85,7 @@ def deep_sa_experiment():
 
     elif FLAGS.optimizer == 'layerwise_gsa_annealer':
 
-        tf_perturber = LayerwiseGSATensorFlowPerturber(FLAGS.learning_rate)
+        tf_perturber = LayerwiseGSATensorFlowPerturber(FLAGS.learning_rate, FLAGS.gsa_q)
 
     elif FLAGS.optimizer == 'sgd':
 
@@ -384,6 +384,10 @@ if __name__ == '__main__':
 
     parser.add_argument('--optimizer', type=str,
                         default='sgd',
+                        help='Optimizer to use.')
+
+    parser.add_argument('--gsa_q', type=float,
+                        default=2.0,
                         help='Optimizer to use.')
 
     # Parse known arguements.
