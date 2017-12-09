@@ -31,7 +31,7 @@ def main(FLAGS):
                                  'layerwise_csa_annealer',
                                  'layerwise_fsa_annealer',
                                  'layerwise_gsa_annealer']),
-                  ('init_temp', [1.0, 5.0, 10.0])
+                  ('init_temp', [1.0, 5.0, 10.0]),
                   ('learning_rate', [1e-3, 1e-4, 1e-5, 1e-6])]
 
     # Translate the design structure into flag strings.
