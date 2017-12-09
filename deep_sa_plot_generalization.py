@@ -50,59 +50,62 @@ for i, bs in enumerate(df.train_batch_size.unique()):
                              plot_num)
 
 
-        # ax.set_xlim(0.00001, 10)
-        ax.set_ylim(5, 14)
+        for k, learning_rate in enumerate(df.learning_rate.unique()):
 
-        run_df = df.loc[(df['train_batch_size'] == bs) &
-                        (df['optimizer'] == opt)]
+            # ax.set_xlim(0.00001, 10)
+            ax.set_ylim(0, 14)
 
-        # print(run_df)
-        # Create some mock data
+            run_df = df.loc[(df['train_batch_size'] == bs) &
+                            (df['optimizer'] == opt)&
+                            (df['learning_rate'] == learning_rate)]
 
-        # mean_val_loss = run_df.groupby([''])['val_loss'].mean()
+            # print(run_df)
+            # Create some mock data
 
-        train_loss = run_df['train_loss']
-        train_loss = run_df.groupby(['step_num'])['train_loss'].mean().tolist()
-        # val_loss = run_df['val_loss']
-        # print(val_loss)
-        val_loss = run_df.groupby(['step_num'])['val_loss'].mean().tolist()
-        # train_loss = run_df.groupby(['step_num'])['train_error'].mean().tolist()
-        # val_loss = run_df['val_loss']
-        # print(val_loss)
-        # val_loss = run_df.groupby(['step_num'])['val_error'].mean().tolist()
-        print(len(val_loss))
-        # val_loss = (run_df['val_loss'].groupby(run_df['step_num']).mean())
-        # print(val_loss)
+            # mean_val_loss = run_df.groupby([''])['val_loss'].mean()
 
-        # val_loss = run_df['val_error']
-        # train_loss = run_df['train_error']
+            train_loss = run_df['train_loss']
+            train_loss = run_df.groupby(['step_num'])['train_loss'].mean().tolist()
+            # val_loss = run_df['val_loss']
+            # print(val_loss)
+            val_loss = run_df.groupby(['step_num'])['val_loss'].mean().tolist()
+            # train_loss = run_df.groupby(['step_num'])['train_error'].mean().tolist()
+            # val_loss = run_df['val_loss']
+            # print(val_loss)
+            # val_loss = run_df.groupby(['step_num'])['val_error'].mean().tolist()
+            print(len(val_loss))
+            # val_loss = (run_df['val_loss'].groupby(run_df['step_num']).mean())
+            # print(val_loss)
 
-        step = run_df['step_num']
-        step = run_df.groupby(['step_num'])['step_num'].mean().tolist()
-        print(len(step))
-        # print(step)
+            # val_loss = run_df['val_error']
+            # train_loss = run_df['train_error']
 
-        # print(len(train_loss))
-        # print(len(mean_val_loss))
-        # show_xlabel = len(df.thread_count.unique()) == (i + 1)
-        # show_label_1 = j == 0
-        # show_label_2 = len(df.batch_size.unique()) == (j + 1)
+            step = run_df['step_num']
+            step = run_df.groupby(['step_num'])['step_num'].mean().tolist()
+            print(len(step))
+            # print(step)
 
-        # annotate_col = i == 0
-        # col_annotation = 'Batch Size = %d' % bs
+            # print(len(train_loss))
+            # print(len(mean_val_loss))
+            # show_xlabel = len(df.thread_count.unique()) == (i + 1)
+            # show_label_1 = j == 0
+            # show_label_2 = len(df.batch_size.unique()) == (j + 1)
 
-        # annotate_row = j == 0
-        # row_annotation = 'Thread \n Count = %d' % tc
+            # annotate_col = i == 0
+            # col_annotation = 'Batch Size = %d' % bs
 
-        # Create axes
-        # ax.loglog()
-        # ax.scatter(train_loss, val_loss, label=opt)
-        # ax.plot(step, train_loss, '--', label=opt)
-        # ax.plot(step, val_loss, label=opt)
-        ax.plot(step, train_loss, '--', label=opt+'_train', alpha=0.5)
-        ax.plot(step, val_loss, label=opt+'val', alpha=0.5)
+            # annotate_row = j == 0
+            # row_annotation = 'Thread \n Count = %d' % tc
 
-        # ax.set_yscale("log", nonposx='clip')
+            # Create axes
+            # ax.loglog()
+            # ax.scatter(train_loss, val_loss, label=opt)
+            # ax.plot(step, train_loss, '--', label=opt)
+            # ax.plot(step, val_loss, label=opt)
+            ax.plot(step, train_loss, '--', label=opt+'_train_learning_rate='+str(learning_rate), alpha=0.5)
+            ax.plot(step, val_loss, label=opt+'_val_learning_rate='+str(learning_rate), alpha=0.5)
+
+            # ax.set_yscale("log", nonposx='clip')
 
         ax.legend()
 
