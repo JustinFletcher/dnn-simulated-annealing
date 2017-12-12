@@ -104,7 +104,7 @@ def main(FLAGS):
 
         # Send job_string to qsub.
         job_ids.append(p.communicate(job_string)[0])
-        time.sleep(0.1)
+        time.sleep(1)
 
         print("-----------------")
 

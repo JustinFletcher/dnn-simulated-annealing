@@ -29,6 +29,18 @@ df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa_generalization_dist_experi
 # subplot_y_str = str(len(df.batch_size.unique()))
 
 
+def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):
+    ax = ax if ax is not None else plt.gca()
+
+    if np.isscalar(yerr) or len(yerr) == len(y):
+        ymin = [y_i - yerr_i for (y_i, yerr_i) in zip(y, yerr)]
+        ymax = [y_i + yerr_i for (y_i, yerr_i) in zip(y, yerr)]
+    elif len(yerr) == 2:
+        ymin, ymax = yerr
+    # ax.plot(x, y)
+    ax.fill_between(x, ymax, ymin, alpha=alpha_fill)
+
+
 fig = plt.figure()
 
 plot_num = 0
@@ -56,7 +68,7 @@ for i, bs in enumerate(df.train_batch_size.unique()):
             ax.set_ylim(0, 14)
 
             run_df = df.loc[(df['train_batch_size'] == bs) &
-                            (df['optimizer'] == opt)&
+                            (df['optimizer'] == opt) &
                             (df['learning_rate'] == learning_rate)]
 
             # print(run_df)
@@ -64,16 +76,17 @@ for i, bs in enumerate(df.train_batch_size.unique()):
 
             # mean_val_loss = run_df.groupby([''])['val_loss'].mean()
 
-            train_loss = run_df['train_loss']
-            train_loss = run_df.groupby(['step_num'])['train_loss'].mean().tolist()
+            train_loss_mean = run_df.groupby(['step_num'])['train_loss'].mean().tolist()
+            train_loss_std = run_df.groupby(['step_num'])['train_loss'].std().tolist()
             # val_loss = run_df['val_loss']
             # print(val_loss)
-            val_loss = run_df.groupby(['step_num'])['val_loss'].mean().tolist()
+            val_loss_mean = run_df.groupby(['step_num'])['val_loss'].mean().tolist()
+            val_loss_std = run_df.groupby(['step_num'])['val_loss'].std().tolist()
             # train_loss = run_df.groupby(['step_num'])['train_error'].mean().tolist()
             # val_loss = run_df['val_loss']
             # print(val_loss)
             # val_loss = run_df.groupby(['step_num'])['val_error'].mean().tolist()
-            print(len(val_loss))
+            print(len(val_loss_mean))
             # val_loss = (run_df['val_loss'].groupby(run_df['step_num']).mean())
             # print(val_loss)
 
@@ -102,8 +115,24 @@ for i, bs in enumerate(df.train_batch_size.unique()):
             # ax.scatter(train_loss, val_loss, label=opt)
             # ax.plot(step, train_loss, '--', label=opt)
             # ax.plot(step, val_loss, label=opt)
-            ax.plot(step, train_loss, '--', label=opt+'_train_learning_rate='+str(learning_rate), alpha=0.5)
-            ax.plot(step, val_loss, label=opt+'_val_learning_rate='+str(learning_rate), alpha=0.5)
+            ax.plot(step,
+                    train_loss_mean,
+                    '--',
+                    label=opt + '_train_learningrate=' + str(learning_rate),
+                    alpha=0.5)
+
+            ax.plot(step,
+                    val_loss_mean,
+                    label=opt + '_val_learningrate=' + str(learning_rate),
+                    alpha=0.5)
+
+            errorfill(step,
+                      train_loss_mean,
+                      train_loss_std, color=None, alpha_fill=0.3, ax=ax)
+
+            errorfill(step,
+                      val_loss_mean,
+                      val_loss_std, color=None, alpha_fill=0.3, ax=ax)
 
             # ax.set_yscale("log", nonposx='clip')
 
