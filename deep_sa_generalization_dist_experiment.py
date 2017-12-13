@@ -279,8 +279,8 @@ def deep_sa_experiment():
                                 vl,
                                 ve,
                                 mrt])
-    copyfile(FLAGS.log_dir + '/' + FLAGS.log_filename,
-             FLAGS.log_dir + '/../')
+    copy(FLAGS.log_dir + '/' + FLAGS.log_filename,
+         FLAGS.log_dir + '/../')
 
     # TODO: Copy logfile up one directory.
 
@@ -387,7 +387,7 @@ if __name__ == '__main__':
                         help='Optimizer to use.')
 
     parser.add_argument('--gsa_q', type=float,
-                        default=2.5,
+                        default=2.3,
                         help='Optimizer to use.')
 
     # Parse known arguements.
