@@ -85,7 +85,8 @@ def deep_sa_experiment():
 
     elif FLAGS.optimizer == 'layerwise_gsa_annealer':
 
-        tf_perturber = LayerwiseGSATensorFlowPerturber(FLAGS.learning_rate, FLAGS.gsa_q)
+        tf_perturber = LayerwiseGSATensorFlowPerturber(FLAGS.learning_rate,
+                                                       FLAGS.gsa_q)
 
     elif FLAGS.optimizer == 'sgd':
 

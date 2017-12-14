@@ -248,7 +248,7 @@ if __name__ == '__main__':
                         help='Summaries log directory.')
 
     parser.add_argument('--log_filename', type=str,
-                        default='deep_sa_generalization_dist_experiment.csv',
+                        default='deep_sa.csv',
                         help='Merged output filename.')
 
     parser.add_argument('--max_runtime', type=int,
@@ -256,7 +256,7 @@ if __name__ == '__main__':
                         help='Number of seconds to run before giving up.')
 
     parser.add_argument('--experiment_py_file', type=str,
-                        default='~/dnn-simulated-annealing/deep_sa.py',
+                        default='~/dnn-simulated-annealing/ddeep_sa_generalization_dist_experiment.py',
                         help='Number of seconds to run before giving up.')
 
     # Parse known arguements.
