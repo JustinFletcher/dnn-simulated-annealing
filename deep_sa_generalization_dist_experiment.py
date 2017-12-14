@@ -310,7 +310,7 @@ if __name__ == '__main__':
 
     # Establish default arguements.
 
-    parser.add_argument('--max_steps', type=int, default=2000,
+    parser.add_argument('--max_steps', type=int, default=20000,
                         help='Number of steps to run trainer.')
 
     parser.add_argument('--test_interval', type=int, default=100,
@@ -388,7 +388,7 @@ if __name__ == '__main__':
                         help='Interval between training batch refresh.')
 
     parser.add_argument('--optimizer', type=str,
-                        default='fsa_annealer',
+                        # default='fsa_annealer',
                         help='Optimizer to use.')
 
     parser.add_argument('--gsa_q', type=float,
