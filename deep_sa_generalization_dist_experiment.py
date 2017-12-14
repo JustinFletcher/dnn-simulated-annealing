@@ -280,8 +280,8 @@ def deep_sa_experiment():
                                 ve,
                                 mrt])
 
-
     print("---------------copy_file-----------------")
+
     copy(FLAGS.log_dir + '/' + FLAGS.log_filename,
          FLAGS.log_dir + '/../')
 
@@ -309,7 +309,7 @@ if __name__ == '__main__':
 
     # Establish default arguements.
 
-    parser.add_argument('--max_steps', type=int, default=1000,
+    parser.add_argument('--max_steps', type=int, default=10000,
                         help='Number of steps to run trainer.')
 
     parser.add_argument('--test_interval', type=int, default=100,

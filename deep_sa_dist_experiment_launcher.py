@@ -219,7 +219,7 @@ def main(FLAGS):
 
                     input_row.append(flag_val)
 
-                try:
+                if tf.gfile.Exists(output_filename):
 
                     with open(output_filename, 'rb') as f:
 
@@ -229,16 +229,13 @@ def main(FLAGS):
 
                             csvwriter.writerow(input_row + output_row)
 
-                except:
+                else:
 
                     print("output filename not found: " + output_filename)
-
 
         print("-----------------")
 
     print("All jobs complete. Exiting.")
-
-
 
 
 if __name__ == '__main__':
@@ -259,7 +256,7 @@ if __name__ == '__main__':
                         help='Number of seconds to run before giving up.')
 
     parser.add_argument('--experiment_py_file', type=str,
-                        default='~/dnn-simulated-annealing/deep_sa_generalization_dist_experiment.py',
+                        default='~/dnn-simulated-annealing/deep_sa.py',
                         help='Number of seconds to run before giving up.')
 
     # Parse known arguements.
