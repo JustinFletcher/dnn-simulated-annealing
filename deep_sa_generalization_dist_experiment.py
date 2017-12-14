@@ -10,7 +10,7 @@ import itertools
 import functools
 import numpy as np
 import tensorflow as tf
-from shutil import copyfile
+from shutil import copy
 
 sys.path.append("../tensorflow-zoo")
 from baseline_model import *
