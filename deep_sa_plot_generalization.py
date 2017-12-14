@@ -45,32 +45,39 @@ fig = plt.figure()
 
 plot_num = 0
 
+row_content = df.batch_interval
+row_levels = row_content.unique()
 
-for i, bs in enumerate(df.train_batch_size.unique()):
+
+col_content = df.optimizer
+col_levels = col_content.unique()
+
+intraplot_content = df.learning_rate
+intraplot_levels = intraplot_content.unique()
+
+
+for i, row_level in enumerate(row_levels):
 
     # print(df.loc[df['thread_count'] == tc])
 
-
-
-    for j, opt in enumerate(df.optimizer.unique()):
+    for j, col_level in enumerate(col_levels):
 
         # Create scatter axis here.
         plot_num += 1
 
-        ax = fig.add_subplot(len(df.train_batch_size.unique()),
-                             len(df.optimizer.unique()),
+        ax = fig.add_subplot(len(row_levels),
+                             len(col_levels),
                              plot_num)
 
-
-        for k, learning_rate in enumerate(df.learning_rate.unique()):
+        for k, intraplot_level in enumerate(intraplot_levels):
 
             # ax.set_xlim(0.00001, 10)
             ax.set_ylim(0, 14)
             ax.set_ylim(0.001, 1)
 
-            run_df = df.loc[(df['train_batch_size'] == bs) &
-                            (df['optimizer'] == opt) &
-                            (df['learning_rate'] == learning_rate)]
+            run_df = df.loc[(row_content == row_level) &
+                            (col_content == col_level) &
+                            (intraplot_content == intraplot_level)]
 
             # print(run_df)
             # Create some mock data
@@ -121,7 +128,7 @@ for i, bs in enumerate(df.train_batch_size.unique()):
 
             ax.plot(step,
                     val_loss_mean,
-                    label=opt + '_val_learningrate=' + str(learning_rate),
+                    label= 'val_learningrate=' + str(intraplot_level),
                     alpha=0.5)
 
             # errorfill(step,
@@ -134,11 +141,11 @@ for i, bs in enumerate(df.train_batch_size.unique()):
 
             # ax.set_yscale("log", nonposx='clip')
 
-        # ax.legend()
+        ax.legend()
 
 
     pad = -70
-    ax.annotate(str(bs), xy=(0, 0.75), xytext=(pad, 0),
+    ax.annotate(str(row_level), xy=(0, 0.75), xytext=(pad, 0),
                 rotation=90,
                 xycoords='axes fraction', textcoords='offset points',
                 size='large', ha='center', va='baseline')

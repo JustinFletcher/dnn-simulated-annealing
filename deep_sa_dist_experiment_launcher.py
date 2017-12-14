@@ -22,9 +22,8 @@ def main(FLAGS):
 
     tf.gfile.MakeDirs(FLAGS.log_dir)
 
-
     # Declare experimental flags.
-    exp_design = [('rep_num', range(3)),
+    exp_design = [('rep_num', range(30)),
                   ('train_batch_size', [128]),
                   ('optimizer', ['csa_annealer',
                                  'fsa_annealer',
@@ -32,16 +31,19 @@ def main(FLAGS):
                                  'layerwise_csa_annealer',
                                  'layerwise_fsa_annealer',
                                  'layerwise_gsa_annealer']),
-                  ('init_temp', [1.0, 5.0]),
-                  ('learning_rate', [1e-3, 1e-4, 1e-5]),
-                  ('batch_interval', [1, 2, 500000])]
+                  ('init_temp', [5.0]),
+                  ('learning_rate', [1e-2, 1e-3, 1e-4, 1e-5, 1e-6]),
+                  ('batch_interval', [1, 10, 100, 1000, 10000])]
 
     # Translate the design structure into flag strings.
     exp_flag_strings = [['--' + f + '=' + str(v) for v in r]
                         for (f, r) in exp_design]
 
     # Produce the Cartesian set of configurations.
-    experimental_configs = itertools.product(*exp_flag_strings)
+    experimental_configs = list(itertools.product(*exp_flag_strings))
+
+    # Shuffle the submission order of configs to avoid asymetries.
+    random.shuffle(experimental_configs)
 
     # Make a list to store job id strings.
     job_ids = []

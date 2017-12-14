@@ -279,9 +279,13 @@ def deep_sa_experiment():
                                 vl,
                                 ve,
                                 mrt])
+
+
+    print("---------------copy_file-----------------")
     copy(FLAGS.log_dir + '/' + FLAGS.log_filename,
          FLAGS.log_dir + '/../')
 
+    print("-----------------------------------------")
     # TODO: Copy logfile up one directory.
 
     return([steps, train_losses, val_losses, mean_running_times])
@@ -305,7 +309,7 @@ if __name__ == '__main__':
 
     # Establish default arguements.
 
-    parser.add_argument('--max_steps', type=int, default=10000,
+    parser.add_argument('--max_steps', type=int, default=1000,
                         help='Number of steps to run trainer.')
 
     parser.add_argument('--test_interval', type=int, default=100,
@@ -383,11 +387,11 @@ if __name__ == '__main__':
                         help='Interval between training batch refresh.')
 
     parser.add_argument('--optimizer', type=str,
-                        default='sgd',
+                        default='gsa_annealer',
                         help='Optimizer to use.')
 
     parser.add_argument('--gsa_q', type=float,
-                        default=2.3,
+                        default=2.1,
                         help='Optimizer to use.')
 
     # Parse known arguements.
