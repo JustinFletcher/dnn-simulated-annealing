@@ -256,7 +256,7 @@ if __name__ == '__main__':
                         help='Number of seconds to run before giving up.')
 
     parser.add_argument('--experiment_py_file', type=str,
-                        default='~/dnn-simulated-annealing/ddeep_sa_generalization_dist_experiment.py',
+                        default='~/dnn-simulated-annealing/deep_sa_generalization_dist_experiment.py',
                         help='Number of seconds to run before giving up.')
 
     # Parse known arguements.
