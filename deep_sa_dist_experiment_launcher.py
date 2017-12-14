@@ -124,9 +124,9 @@ def main(FLAGS):
 
         print('Time elapsed: ' + str(elapsed_time) + ' seconds.')
 
-        time.sleep(5)
+        time.sleep(10)
 
-        elapsed_time += 1
+        elapsed_time += 10
 
         # Create a list to hold the Bool job complete flags
         job_complete_flags = []
@@ -171,55 +171,62 @@ def main(FLAGS):
         # Check if we've reached timeout.
         timeout = (elapsed_time > FLAGS.max_runtime)
 
+        # # Accomodate Python 3+
+        # with open(FLAGS.log_dir '/' + FLAGS.log_filename, 'w') as csvfile:
+
+        # Accomodate Python 2.7 on Hokulea.
+        with open(FLAGS.log_dir + '/' + FLAGS.log_filename, 'wb') as csvfile:
+
+            # Parse out experiment parameter headers.
+            parameter_labels = [flag_string for (flag_string, _) in exp_design]
+
+            # Manually note response varaibles (MUST: Couple with experiment).
+            response_labels = ['step_num',
+                               'train_loss',
+                               'train_error',
+                               'val_loss',
+                               'val_error',
+                               'mean_running_time']
+
+            # Join lists.
+            headers = parameter_labels + response_labels
+
+            # Open a writer and write the header.
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerow(headers)
+
+            # Iterate over each eperimental mapping and write out.
+            for (input_flags, output_filename) in input_output_maps:
+
+                input_row = []
+
+                # Process the flags into output values.
+                for flag in input_flags:
+
+                    flag_val = flag.split('=')[1]
+
+                    input_row.append(flag_val)
+
+                try:
+
+                    with open(output_filename, 'rb') as f:
+
+                        reader = csv.reader(f)
+
+                        for output_row in reader:
+
+                            csvwriter.writerow(input_row + output_row)
+
+                except:
+
+                    print("output filename not found: " + output_filename)
+
+
         print("-----------------")
 
-    print("All jobs complete. Merging results.")
+    print("All jobs complete. Exiting.")
 
-    time.sleep(5)
 
-    # # Accomodate Python 3+
-    # with open(FLAGS.log_dir '/' + FLAGS.log_filename, 'w') as csvfile:
-
-    # Accomodate Python 2.7 on Hokulea.
-    with open(FLAGS.log_dir + '/' + FLAGS.log_filename, 'wb') as csvfile:
-
-        # Parse out experiment parameter headers.
-        parameter_labels = [flag_string for (flag_string, _) in exp_design]
-
-        # Manually note response varaibles (MUST: Couple with experiment).
-        response_labels = ['step_num',
-                           'train_loss',
-                           'train_error',
-                           'val_loss',
-                           'val_error',
-                           'mean_running_time']
-
-        # Join lists.
-        headers = parameter_labels + response_labels
-
-        # Open a writer and write the header.
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(headers)
-
-        # Iterate over each eperimental mapping and write out.
-        for (input_flags, output_filename) in input_output_maps:
-
-            input_row = []
-
-            # Process the flags into output values.
-            for flag in input_flags:
-
-                flag_val = flag.split('=')[1]
-
-                input_row.append(flag_val)
-
-            with open(output_filename, 'rb') as f:
-
-                reader = csv.reader(f)
-
-                for output_row in reader:
-
-                    csvwriter.writerow(input_row + output_row)
 
 
 if __name__ == '__main__':
@@ -228,7 +235,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--log_dir', type=str,
-                        default='../log/deep_sa_generalization_dist_experiment/',
+                        default='../log/deep_sa/',
                         help='Summaries log directory.')
 
     parser.add_argument('--log_filename', type=str,
