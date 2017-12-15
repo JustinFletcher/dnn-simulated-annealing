@@ -102,7 +102,7 @@ def main(FLAGS):
         input_output_map = (experimental_config, temp_log_dir, log_filename)
         input_output_maps.append(input_output_map)
 
-        # Build the job sting.
+        # Build the job string.
         job_string = """#!/bin/bash
         #PBS -N %s
         #PBS -l walltime=%s
@@ -113,6 +113,7 @@ def main(FLAGS):
         #PBS -q standard
         module load anaconda2
         module load tensorflow/1.0.0
+        module load cudnn/5.1
         cd $PBS_O_WORKDIR
         %s""" % (job_name, walltime, select, job_name, job_name, command)
 
