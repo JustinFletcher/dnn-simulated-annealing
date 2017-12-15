@@ -34,7 +34,7 @@ def main(FLAGS):
                                  'layerwise_gsa_annealer']),
                   ('init_temp', [5.0]),
                   ('learning_rate', [1e-2, 1e-3, 1e-4, 1e-5, 1e-6]),
-                  ('batch_interval', [1, 100, 1000, 10000, 1000000])]
+                  ('batch_interval', [1000000])]
 
     # exp_design = [('rep_num', range(2)),
     #               ('train_batch_size', [128]),
