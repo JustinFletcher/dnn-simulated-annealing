@@ -12,6 +12,6 @@
 #PBS -A MHPCC96670DA1 
 cp -R ~/data $WORKDIR
 module load anaconda2
-module load tensorflow
+module load tensorflow/1.0.0
 cd ~/dnn-simulated-annealing
 python deep_sa_dist_experiment_launcher.py

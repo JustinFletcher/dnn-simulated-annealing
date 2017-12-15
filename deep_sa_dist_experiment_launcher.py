@@ -112,7 +112,7 @@ def main(FLAGS):
         #PBS -A MHPCC96670DA1
         #PBS -q standard
         module load anaconda2
-        module load tensorflow
+        module load tensorflow/1.0.0
         cd $PBS_O_WORKDIR
         %s""" % (job_name, walltime, select, job_name, job_name, command)
 
