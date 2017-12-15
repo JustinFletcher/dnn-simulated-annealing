@@ -99,7 +99,7 @@ def main(FLAGS):
         # log_filenames.append(log_filename)
 
         # Build IO maps.
-        input_output_map = (experimental_config, temp_log_dir + log_filename)
+        input_output_map = (experimental_config, temp_log_dir, log_filename)
         input_output_maps.append(input_output_map)
 
         # Build the job sting.
@@ -208,7 +208,9 @@ def main(FLAGS):
             csvwriter.writerow(headers)
 
             # Iterate over each eperimental mapping and write out.
-            for (input_flags, output_filename) in input_output_maps:
+            for (input_flags,
+                 output_dir,
+                 output_filename) in input_output_maps:
 
                 input_row = []
 
@@ -219,15 +221,24 @@ def main(FLAGS):
 
                     input_row.append(flag_val)
 
-                if tf.gfile.Exists(output_filename):
+                output_file = output_dir + output_filename
 
-                    with open(output_filename, 'rb') as f:
+                # Check if the output file has been written.
+                if tf.gfile.Exists(output_file):
+
+                    print("-----------remove_model_ckpt------------")
+
+                    tf.gfile.Remove(output_dir + "model.ckpt*")
+
+                    with open(output_file, 'rb') as f:
 
                         reader = csv.reader(f)
 
                         for output_row in reader:
 
                             csvwriter.writerow(input_row + output_row)
+
+                    print("---------------------------------------")
 
                 else:
 
