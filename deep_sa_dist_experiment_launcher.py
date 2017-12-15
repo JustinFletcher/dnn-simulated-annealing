@@ -229,7 +229,7 @@ def main(FLAGS):
 
                     print("-----------remove_model_ckpt------------")
 
-                    tf.gfile.Remove(output_dir + "model.ckpt*")
+                    # tf.gfile.Remove(output_dir + "model.ckpt*")
 
                     with open(output_file, 'rb') as f:
 
