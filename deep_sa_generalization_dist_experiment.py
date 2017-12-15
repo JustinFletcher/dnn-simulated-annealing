@@ -388,7 +388,7 @@ if __name__ == '__main__':
                         help='Interval between training batch refresh.')
 
     parser.add_argument('--optimizer', type=str,
-                        # default='fsa_annealer',
+                        default='fsa_annealer',
                         help='Optimizer to use.')
 
     parser.add_argument('--gsa_q', type=float,
