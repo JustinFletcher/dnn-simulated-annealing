@@ -10,7 +10,7 @@ from mpl_toolkits.axes_grid1 import Grid
 
 plt.style.use('ggplot')
 
-df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa_generalization_dist_experiment/deep_sa_generalization_dist_experiment.csv')
+df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa.csv')
 # df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa_generalization/deep_sa_experiment.csv')
 
 # max_running_time = np.max(df.running_time)
@@ -45,7 +45,7 @@ fig = plt.figure()
 
 plot_num = 0
 
-row_content = df.batch_interval
+row_content = df.train_batch_size
 row_levels = row_content.unique()
 
 
@@ -69,11 +69,20 @@ for i, row_level in enumerate(row_levels):
                              len(col_levels),
                              plot_num)
 
+        show_xlabel = len(row_levels) == (i + 1)
+
+        show_ylabel = j == 0
+
+        annotate_col = i == 0
+        col_annotation = 'Optimizer: \n' + col_level
+
+        annotate_row = j == 0
+        row_annotation = 'Train Set Size: \n' + str(row_level)
+
         for k, intraplot_level in enumerate(intraplot_levels):
 
             # ax.set_xlim(0.00001, 10)
-            ax.set_ylim(0, 14)
-            ax.set_ylim(0.001, 1)
+            # ax.set_ylim(0.001, 1)
 
             run_df = df.loc[(row_content == row_level) &
                             (col_content == col_level) &
@@ -90,45 +99,27 @@ for i, row_level in enumerate(row_levels):
             val_loss_mean = run_df.groupby(['step_num'])['val_loss'].mean().tolist()
             val_loss_std = run_df.groupby(['step_num'])['val_loss'].std().tolist()
 
-            train_loss_mean = run_df.groupby(['step_num'])['train_error'].mean().tolist()
-            train_loss_std = run_df.groupby(['step_num'])['train_error'].std().tolist()
+            # train_loss_mean = run_df.groupby(['step_num'])['train_error'].mean().tolist()
+            # train_loss_std = run_df.groupby(['step_num'])['train_error'].std().tolist()
 
-            val_loss_mean = run_df.groupby(['step_num'])['val_error'].mean().tolist()
-            val_loss_std = run_df.groupby(['step_num'])['val_error'].std().tolist()
+            # val_loss_mean = run_df.groupby(['step_num'])['val_error'].mean().tolist()
+            # val_loss_std = run_df.groupby(['step_num'])['val_error'].std().tolist()
 
             print(len(val_loss_mean))
 
             step = run_df['step_num']
             step = run_df.groupby(['step_num'])['step_num'].mean().tolist()
             print(len(step))
-            # print(step)
 
-            # print(len(train_loss))
-            # print(len(mean_val_loss))
-            # show_xlabel = len(df.thread_count.unique()) == (i + 1)
-            # show_label_1 = j == 0
-            # show_label_2 = len(df.batch_size.unique()) == (j + 1)
-
-            # annotate_col = i == 0
-            # col_annotation = 'Batch Size = %d' % bs
-
-            # annotate_row = j == 0
-            # row_annotation = 'Thread \n Count = %d' % tc
-
-            # Create axes
-            # ax.loglog()
-            # ax.scatter(train_loss, val_loss, label=opt)
-            # ax.plot(step, train_loss, '--', label=opt)
-            # ax.plot(step, val_loss, label=opt)
-            # ax.plot(step,
-            #         train_loss_mean,
-            #         '--',
-            #         label=opt + '_train_learningrate=' + str(learning_rate),
-            #         alpha=0.5)
+            ax.plot(step,
+                    train_loss_mean,
+                    "--",
+                    label='alpha=' + str(intraplot_level),
+                    alpha=0.5)
 
             ax.plot(step,
                     val_loss_mean,
-                    label= 'val_learningrate=' + str(intraplot_level),
+                    label='alpha=' + str(intraplot_level),
                     alpha=0.5)
 
             # errorfill(step,
@@ -139,16 +130,42 @@ for i, row_level in enumerate(row_levels):
                       val_loss_mean,
                       val_loss_std, color=None, alpha_fill=0.3, ax=ax)
 
-            # ax.set_yscale("log", nonposx='clip')
+            ax.set_yscale("log", nonposx='clip')
 
-        ax.legend()
+            ax.set_ylim(0.1, 14)
 
 
-    pad = -70
-    ax.annotate(str(row_level), xy=(0, 0.75), xytext=(pad, 0),
-                rotation=90,
-                xycoords='axes fraction', textcoords='offset points',
-                size='large', ha='center', va='baseline')
+        if show_xlabel:
+
+            ax.set_xlabel('Training Step')
+
+        else:
+
+            ax.xaxis.set_ticklabels([])
+
+        if show_ylabel:
+
+            ax.set_ylabel('Validation Set Loss (mean, std)')
+
+        else:
+
+            ax.yaxis.set_ticklabels([])
+
+        if annotate_col:
+            pad = 10
+            ax.annotate(col_annotation, xy=(0.5, 1), xytext=(0, pad),
+                        xycoords='axes fraction', textcoords='offset points',
+                        size='large', ha='center', va='baseline')
+
+        if annotate_row:
+            pad = -100
+            ax.annotate(row_annotation, xy=(0, 0.55), xytext=(pad, 0),
+                        rotation=90,
+                        xycoords='axes fraction', textcoords='offset points',
+                        size='large', ha='center', va='baseline')
+
+plt.legend()
+
 plt.suptitle("Generalization and Training Loss of SGD and SA by Training Set Size")
 
 plt.show()

@@ -310,10 +310,10 @@ if __name__ == '__main__':
 
     # Establish default arguements.
 
-    parser.add_argument('--max_steps', type=int, default=20000,
+    parser.add_argument('--max_steps', type=int, default=50000,
                         help='Number of steps to run trainer.')
 
-    parser.add_argument('--test_interval', type=int, default=100,
+    parser.add_argument('--test_interval', type=int, default=1000,
                         help='Number of steps between test set evaluations.')
 
     parser.add_argument('--learning_rate', type=float, default=1e-4,
@@ -392,7 +392,7 @@ if __name__ == '__main__':
                         help='Optimizer to use.')
 
     parser.add_argument('--gsa_q', type=float,
-                        default=2.1,
+                        default=2.0,
                         help='Optimizer to use.')
 
     # Parse known arguements.
