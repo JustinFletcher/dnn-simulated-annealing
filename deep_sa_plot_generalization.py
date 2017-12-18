@@ -38,7 +38,7 @@ def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):
     elif len(yerr) == 2:
         ymin, ymax = yerr
     # ax.plot(x, y)
-    ax.fill_between(x, ymax, ymin, alpha=alpha_fill)
+    ax.fill_between(x, ymax, ymin, alpha=alpha_fill, color=color)
 
 
 fig = plt.figure()
@@ -88,10 +88,7 @@ for i, row_level in enumerate(row_levels):
                             (col_content == col_level) &
                             (intraplot_content == intraplot_level)]
 
-            # print(run_df)
-            # Create some mock data
-
-            # mean_val_loss = run_df.groupby([''])['val_loss'].mean()
+            # if plot_loss:
 
             train_loss_mean = run_df.groupby(['step_num'])['train_loss'].mean().tolist()
             train_loss_std = run_df.groupby(['step_num'])['train_loss'].std().tolist()
@@ -99,11 +96,19 @@ for i, row_level in enumerate(row_levels):
             val_loss_mean = run_df.groupby(['step_num'])['val_loss'].mean().tolist()
             val_loss_std = run_df.groupby(['step_num'])['val_loss'].std().tolist()
 
+            # ax.set_yscale("log", nonposx='clip')
+
+            ax.set_ylim(0.01, 15)
+
+            # if plot_error:
+
             # train_loss_mean = run_df.groupby(['step_num'])['train_error'].mean().tolist()
             # train_loss_std = run_df.groupby(['step_num'])['train_error'].std().tolist()
 
             # val_loss_mean = run_df.groupby(['step_num'])['val_error'].mean().tolist()
             # val_loss_std = run_df.groupby(['step_num'])['val_error'].std().tolist()
+
+            # ax.set_ylim(0, 1)
 
             print(len(val_loss_mean))
 
@@ -111,29 +116,27 @@ for i, row_level in enumerate(row_levels):
             step = run_df.groupby(['step_num'])['step_num'].mean().tolist()
             print(len(step))
 
+            line, = ax.plot(step,
+                            val_loss_mean,
+                            label='alpha=' + str(intraplot_level),
+                            alpha=0.5)
+
+            errorfill(step,
+                      val_loss_mean,
+                      val_loss_std,
+                      color=line.get_color(),
+                      alpha_fill=0.3, ax=ax)
+
             ax.plot(step,
                     train_loss_mean,
                     "--",
-                    label='alpha=' + str(intraplot_level),
-                    alpha=0.5)
-
-            ax.plot(step,
-                    val_loss_mean,
+                    color=line.get_color(),
                     label='alpha=' + str(intraplot_level),
                     alpha=0.5)
 
             # errorfill(step,
             #           train_loss_mean,
             #           train_loss_std, color=None, alpha_fill=0.3, ax=ax)
-
-            errorfill(step,
-                      val_loss_mean,
-                      val_loss_std, color=None, alpha_fill=0.3, ax=ax)
-
-            ax.set_yscale("log", nonposx='clip')
-
-            ax.set_ylim(0.1, 14)
-
 
         if show_xlabel:
 
