@@ -10,24 +10,7 @@ from mpl_toolkits.axes_grid1 import Grid
 
 plt.style.use('ggplot')
 
-df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa.csv')
-# df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa_generalization/deep_sa_experiment.csv')
-
-# max_running_time = np.max(df.running_time)
-# print(max_running_time)
-# min_running_time = 0
-
-# max_queue_size = np.max(df.queue_size)
-# print(max_queue_size)
-# min_queue_size = 0
-
-# max_step_num = np.max(df.step_num)
-# print(max_queue_size)
-# min_step_num = np.min(df.step_num)
-
-# subplot_x_str = str(len(df.thread_count.unique()))
-# subplot_y_str = str(len(df.batch_size.unique()))
-
+df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa_batch_size_study.csv')
 
 def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):
     ax = ax if ax is not None else plt.gca()
@@ -49,7 +32,7 @@ row_content = df.train_batch_size
 row_levels = row_content.unique()
 
 
-col_content = df.optimizer
+col_content = df.learning_rate
 col_levels = col_content.unique()
 
 intraplot_content = df.learning_rate
@@ -57,8 +40,6 @@ intraplot_levels = intraplot_content.unique()
 
 
 for i, row_level in enumerate(row_levels):
-
-    # print(df.loc[df['thread_count'] == tc])
 
     for j, col_level in enumerate(col_levels):
 
@@ -74,7 +55,7 @@ for i, row_level in enumerate(row_levels):
         show_ylabel = j == 0
 
         annotate_col = i == 0
-        col_annotation = 'Optimizer: \n' + col_level
+        col_annotation = 'Learning Rate: \n' + str(col_level)
 
         annotate_row = j == 0
         row_annotation = 'Train Set Size: \n' + str(row_level)
@@ -102,13 +83,13 @@ for i, row_level in enumerate(row_levels):
 
             # if plot_error:
 
-            train_loss_mean = run_df.groupby(['step_num'])['train_error'].mean().tolist()
-            train_loss_std = run_df.groupby(['step_num'])['train_error'].std().tolist()
+            # train_loss_mean = run_df.groupby(['step_num'])['train_error'].mean().tolist()
+            # train_loss_std = run_df.groupby(['step_num'])['train_error'].std().tolist()
 
-            val_loss_mean = run_df.groupby(['step_num'])['val_error'].mean().tolist()
-            val_loss_std = run_df.groupby(['step_num'])['val_error'].std().tolist()
+            # val_loss_mean = run_df.groupby(['step_num'])['val_error'].mean().tolist()
+            # val_loss_std = run_df.groupby(['step_num'])['val_error'].std().tolist()
 
-            ax.set_ylim(0, 1)
+            # ax.set_ylim(0, 1)
 
             print(len(val_loss_mean))
 
