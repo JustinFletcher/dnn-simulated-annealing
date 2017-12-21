@@ -61,7 +61,7 @@ def main(FLAGS):
 
         # Customize your options here.
         job_name = "dist_ex_%d" % i
-        walltime = "16:00:00"
+        walltime = "72:00:00"
         select = "1:ncpus=20:mpiprocs=20"
         command = "python " + FLAGS.experiment_py_file
 
