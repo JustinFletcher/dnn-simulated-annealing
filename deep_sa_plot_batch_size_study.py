@@ -1,25 +1,27 @@
 from __future__ import print_function
 
 import numpy as np
-import matplotlib.cm as cm
-import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import pandas as pd
-
-from mpl_toolkits.axes_grid1 import Grid
 
 plt.style.use('ggplot')
 
 df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa_batch_size_study.csv')
 
+
 def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):
+
     ax = ax if ax is not None else plt.gca()
 
     if np.isscalar(yerr) or len(yerr) == len(y):
+
         ymin = [y_i - yerr_i for (y_i, yerr_i) in zip(y, yerr)]
         ymax = [y_i + yerr_i for (y_i, yerr_i) in zip(y, yerr)]
+
     elif len(yerr) == 2:
+
         ymin, ymax = yerr
+    
     # ax.plot(x, y)
     ax.fill_between(x, ymax, ymin, alpha=alpha_fill, color=color)
 
@@ -83,13 +85,13 @@ for i, row_level in enumerate(row_levels):
 
             # if plot_error:
 
-            # train_loss_mean = run_df.groupby(['step_num'])['train_error'].mean().tolist()
-            # train_loss_std = run_df.groupby(['step_num'])['train_error'].std().tolist()
+            train_loss_mean = run_df.groupby(['step_num'])['train_error'].mean().tolist()
+            train_loss_std = run_df.groupby(['step_num'])['train_error'].std().tolist()
 
-            # val_loss_mean = run_df.groupby(['step_num'])['val_error'].mean().tolist()
-            # val_loss_std = run_df.groupby(['step_num'])['val_error'].std().tolist()
+            val_loss_mean = run_df.groupby(['step_num'])['val_error'].mean().tolist()
+            val_loss_std = run_df.groupby(['step_num'])['val_error'].std().tolist()
 
-            # ax.set_ylim(0, 1)
+            ax.set_ylim(0, 1)
 
             print(len(val_loss_mean))
 
