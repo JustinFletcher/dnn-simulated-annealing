@@ -95,9 +95,7 @@ def main(FLAGS):
         #PBS -e ~/log/error/%s.err
         #PBS -A MHPCC96670DA1
         #PBS -q standard
-        module load anaconda2
-        module load tensorflow/1.0.0
-        module load cudnn/5.1
+        module load anaconda2/5.0.1 gcc/5.3.0 cudnn/6.0
         cd $PBS_O_WORKDIR
         %s""" % (job_name, walltime, select, job_name, job_name, command)
 
