@@ -85,13 +85,13 @@ for i, row_level in enumerate(row_levels):
 
             # if plot_error:
 
-            train_loss_mean = run_df.groupby(['step_num'])['train_error'].mean().tolist()
-            train_loss_std = run_df.groupby(['step_num'])['train_error'].std().tolist()
+            # train_loss_mean = run_df.groupby(['step_num'])['train_error'].mean().tolist()
+            # train_loss_std = run_df.groupby(['step_num'])['train_error'].std().tolist()
 
-            val_loss_mean = run_df.groupby(['step_num'])['val_error'].mean().tolist()
-            val_loss_std = run_df.groupby(['step_num'])['val_error'].std().tolist()
+            # val_loss_mean = run_df.groupby(['step_num'])['val_error'].mean().tolist()
+            # val_loss_std = run_df.groupby(['step_num'])['val_error'].std().tolist()
 
-            ax.set_ylim(0, 1)
+            # ax.set_ylim(0, 1)
 
             print(len(val_loss_mean))
 

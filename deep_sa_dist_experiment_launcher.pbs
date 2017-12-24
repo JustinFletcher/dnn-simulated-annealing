@@ -11,8 +11,6 @@
 #PBS -q standard
 #PBS -A MHPCC96670DA1 
 cp -R ~/data $WORKDIR
-module load anaconda2
-module load tensorflow/1.0.0
-module load cudnn/5.1
+module load anaconda2/5.0.1 gcc/5.3.0 cudnn/6.0
 cd ~/dnn-simulated-annealing
 python deep_sa_dist_experiment_launcher.py
