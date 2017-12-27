@@ -1,42 +1,27 @@
 from __future__ import print_function
 
 import numpy as np
-import matplotlib.cm as cm
-import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from mpl_toolkits.axes_grid1 import Grid
-
 plt.style.use('ggplot')
 
-df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa.csv')
-# df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa_generalization/deep_sa_experiment.csv')
-
-# max_running_time = np.max(df.running_time)
-# print(max_running_time)
-# min_running_time = 0
-
-# max_queue_size = np.max(df.queue_size)
-# print(max_queue_size)
-# min_queue_size = 0
-
-# max_step_num = np.max(df.step_num)
-# print(max_queue_size)
-# min_step_num = np.min(df.step_num)
-
-# subplot_x_str = str(len(df.thread_count.unique()))
-# subplot_y_str = str(len(df.batch_size.unique()))
+df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa_batch_size_study.csv')
 
 
 def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):
+
     ax = ax if ax is not None else plt.gca()
 
     if np.isscalar(yerr) or len(yerr) == len(y):
+
         ymin = [y_i - yerr_i for (y_i, yerr_i) in zip(y, yerr)]
         ymax = [y_i + yerr_i for (y_i, yerr_i) in zip(y, yerr)]
+
     elif len(yerr) == 2:
+
         ymin, ymax = yerr
+    
     # ax.plot(x, y)
     ax.fill_between(x, ymax, ymin, alpha=alpha_fill, color=color)
 
@@ -49,7 +34,7 @@ row_content = df.train_batch_size
 row_levels = row_content.unique()
 
 
-col_content = df.optimizer
+col_content = df.learning_rate
 col_levels = col_content.unique()
 
 intraplot_content = df.learning_rate
@@ -57,8 +42,6 @@ intraplot_levels = intraplot_content.unique()
 
 
 for i, row_level in enumerate(row_levels):
-
-    # print(df.loc[df['thread_count'] == tc])
 
     for j, col_level in enumerate(col_levels):
 
@@ -74,7 +57,7 @@ for i, row_level in enumerate(row_levels):
         show_ylabel = j == 0
 
         annotate_col = i == 0
-        col_annotation = 'Optimizer: \n' + col_level
+        col_annotation = 'Learning Rate: \n' + str(col_level)
 
         annotate_row = j == 0
         row_annotation = 'Train Set Size: \n' + str(row_level)
@@ -115,16 +98,6 @@ for i, row_level in enumerate(row_levels):
             step = run_df['step_num']
             step = run_df.groupby(['step_num'])['step_num'].mean().tolist()
             print(len(step))
-
-
-
-            train_loss_mean = train_loss_mean[:2]
-            train_loss_std = train_loss_std[:2]
-
-            val_loss_mean = val_loss_mean[:2]
-            val_loss_std = val_loss_std[:2] 
-
-            step = step[:2]
 
             line, = ax.plot(step,
                             val_loss_mean,
