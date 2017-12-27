@@ -34,10 +34,10 @@ row_content = df.train_batch_size
 row_levels = row_content.unique()
 
 
-col_content = df.learning_rate
+col_content = df.batch_interval
 col_levels = col_content.unique()
 
-intraplot_content = df.learning_rate
+intraplot_content = df.batch_interval
 intraplot_levels = intraplot_content.unique()
 
 

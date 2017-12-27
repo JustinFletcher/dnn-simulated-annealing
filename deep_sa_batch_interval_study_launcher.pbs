@@ -13,4 +13,4 @@
 cp -R ~/data $WORKDIR
 module load anaconda2/5.0.1 gcc/5.3.0 cudnn/6.0
 cd ~/dnn-simulated-annealing
-python deep_sa_batch_size_study_launcher.py
+python deep_sa_batch_interval_study_launcher.py
