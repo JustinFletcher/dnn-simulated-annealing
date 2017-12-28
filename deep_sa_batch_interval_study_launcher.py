@@ -237,11 +237,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--log_dir', type=str,
-                        default='../log/deep_sa_batch_size_study/',
+                        default='../log/deep_sa_batch_interval_study/',
                         help='Summaries log directory.')
 
     parser.add_argument('--log_filename', type=str,
-                        default='deep_sa_batch_size_study.csv',
+                        default='deep_sa_batch_interval_study.csv',
                         help='Merged output filename.')
 
     parser.add_argument('--max_runtime', type=int,

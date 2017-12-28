@@ -21,7 +21,7 @@ def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):
     elif len(yerr) == 2:
 
         ymin, ymax = yerr
-    
+
     # ax.plot(x, y)
     ax.fill_between(x, ymax, ymin, alpha=alpha_fill, color=color)
 

@@ -21,7 +21,7 @@ def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):
     elif len(yerr) == 2:
 
         ymin, ymax = yerr
-    
+
     # ax.plot(x, y)
     ax.fill_between(x, ymax, ymin, alpha=alpha_fill, color=color)
 
@@ -33,11 +33,10 @@ plot_num = 0
 row_content = df.train_batch_size
 row_levels = row_content.unique()
 
-
-col_content = df.learning_rate
+col_content = df.batch_interval
 col_levels = col_content.unique()
 
-intraplot_content = df.learning_rate
+intraplot_content = df.batch_interval
 intraplot_levels = intraplot_content.unique()
 
 
@@ -57,7 +56,7 @@ for i, row_level in enumerate(row_levels):
         show_ylabel = j == 0
 
         annotate_col = i == 0
-        col_annotation = 'Learning Rate: \n' + str(col_level)
+        col_annotation = 'Batch Interval: \n' + str(col_level)
 
         annotate_row = j == 0
         row_annotation = 'Train Set Size: \n' + str(row_level)

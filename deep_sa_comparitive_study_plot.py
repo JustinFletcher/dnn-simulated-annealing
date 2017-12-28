@@ -11,6 +11,9 @@ from mpl_toolkits.axes_grid1 import Grid
 plt.style.use('ggplot')
 
 df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa.csv')
+
+
+df = df.sort_values(['train_batch_size', 'optimizer'])
 # df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa_generalization/deep_sa_experiment.csv')
 
 # max_running_time = np.max(df.running_time)
@@ -90,25 +93,25 @@ for i, row_level in enumerate(row_levels):
 
             # if plot_loss:
 
-            train_loss_mean = run_df.groupby(['step_num'])['train_loss'].mean().tolist()
-            train_loss_std = run_df.groupby(['step_num'])['train_loss'].std().tolist()
+            # train_loss_mean = run_df.groupby(['step_num'])['train_loss'].mean().tolist()
+            # train_loss_std = run_df.groupby(['step_num'])['train_loss'].std().tolist()
 
-            val_loss_mean = run_df.groupby(['step_num'])['val_loss'].mean().tolist()
-            val_loss_std = run_df.groupby(['step_num'])['val_loss'].std().tolist()
+            # val_loss_mean = run_df.groupby(['step_num'])['val_loss'].mean().tolist()
+            # val_loss_std = run_df.groupby(['step_num'])['val_loss'].std().tolist()
 
-            ax.set_yscale("log", nonposx='clip')
+            # ax.set_yscale("log", nonposx='clip')
 
-            ax.set_ylim(0.01, 15)
+            # ax.set_ylim(0.01, 15)
 
             # if plot_error:
 
-            # train_loss_mean = run_df.groupby(['step_num'])['train_error'].mean().tolist()
-            # train_loss_std = run_df.groupby(['step_num'])['train_error'].std().tolist()
+            train_loss_mean = run_df.groupby(['step_num'])['train_error'].mean().tolist()
+            train_loss_std = run_df.groupby(['step_num'])['train_error'].std().tolist()
 
-            # val_loss_mean = run_df.groupby(['step_num'])['val_error'].mean().tolist()
-            # val_loss_std = run_df.groupby(['step_num'])['val_error'].std().tolist()
+            val_loss_mean = run_df.groupby(['step_num'])['val_error'].mean().tolist()
+            val_loss_std = run_df.groupby(['step_num'])['val_error'].std().tolist()
 
-            # ax.set_ylim(0, 1)
+            ax.set_ylim(0, 1)
 
             print(len(val_loss_mean))
 

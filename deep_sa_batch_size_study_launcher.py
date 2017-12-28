@@ -25,7 +25,7 @@ def main(FLAGS):
 
     # # Declare experimental flags.
     exp_design = [('rep_num', range(5)),
-                  ('train_batch_size', [128, 2048, 8192, 16384]),
+                  ('train_batch_size', [128, 1024, 2048, 8192, 16384]),
                   ('optimizer', ['csa_annealer']),
                   ('init_temp', [5.0]),
                   ('learning_rate', [1e-2, 1e-3, 1e-4, 1e-5, 1e-6]),
