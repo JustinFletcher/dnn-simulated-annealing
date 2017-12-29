@@ -1,13 +1,10 @@
 
 
-import os
 import sys
 import csv
 import time
 import random
 import argparse
-import itertools
-import functools
 import numpy as np
 import tensorflow as tf
 from shutil import copy

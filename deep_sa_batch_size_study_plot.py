@@ -8,6 +8,7 @@ plt.style.use('ggplot')
 
 df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa_batch_size_study.csv')
 
+df = df.sort_values(['train_batch_size', 'learning_rate'])
 
 def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):
 

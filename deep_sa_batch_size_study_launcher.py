@@ -25,12 +25,12 @@ def main(FLAGS):
 
     # # Declare experimental flags.
     exp_design = [('rep_num', range(5)),
-                  ('train_batch_size', [128, 1024, 2048, 8192, 16384]),
+                  ('train_batch_size', [128, 512, 1024, 2048]),
                   ('optimizer', ['csa_annealer']),
-                  ('init_temp', [5.0]),
-                  ('learning_rate', [1e-2, 1e-3, 1e-4, 1e-5, 1e-6]),
+                  ('init_temp', [30.0]),
+                  ('learning_rate', [1e-2, 1e-3, 1e-4]),
+                  ('max_steps', [30000]),
                   ('batch_interval', [1])]
-
 
     # Translate the design structure into flag strings.
     exp_flag_strings = [['--' + f + '=' + str(v) for v in r]
