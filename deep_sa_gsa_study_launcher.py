@@ -25,12 +25,13 @@ def main(FLAGS):
 
     # # Declare experimental flags.
     exp_design = [('rep_num', range(5)),
-                  ('train_batch_size', [1024, 2048]),
-                  ('optimizer', ['csa_annealer']),
+                  ('train_batch_size', [1024]),
+                  ('optimizer', ['gsa_annealer']),
                   ('init_temp', [30.0]),
                   ('learning_rate', [1e-3]),
-                  ('max_steps', [30000]),
-                  ('batch_interval', [1, 10, 100, 1000, 1000000])]
+                  ('max_steps', [50000]),
+                  ('batch_interval', [1000]),
+                  ('gsa_q', [1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75])]
 
     # Translate the design structure into flag strings.
     exp_flag_strings = [['--' + f + '=' + str(v) for v in r]
@@ -238,11 +239,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--log_dir', type=str,
-                        default='../log/deep_sa_batch_interval_study/',
+                        default='../log/deep_sa_gsa_study/',
                         help='Summaries log directory.')
 
     parser.add_argument('--log_filename', type=str,
-                        default='deep_sa_batch_interval_study.csv',
+                        default='deep_sa_gsa_study.csv',
                         help='Merged output filename.')
 
     parser.add_argument('--max_runtime', type=int,
@@ -251,7 +252,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--experiment_py_file', type=str,
                         default='~/dnn-simulated-annealing/deep_sa_generalization_dist_experiment.py',
-                        help='Number of seconds to run before giving up.')
+                        help='Full path to Python experiment script.')
 
     # Parse known arguements.
     FLAGS, unparsed = parser.parse_known_args()

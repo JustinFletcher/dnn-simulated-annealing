@@ -6,7 +6,7 @@ import pandas as pd
 
 plt.style.use('ggplot')
 
-df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa_batch_interval_study.csv')
+df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa_gsa_study.csv')
 
 df = df.sort_values(['train_batch_size', 'batch_interval'])
 
