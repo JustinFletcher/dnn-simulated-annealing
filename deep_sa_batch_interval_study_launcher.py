@@ -27,9 +27,9 @@ def main(FLAGS):
     exp_design = [('rep_num', range(5)),
                   ('train_batch_size', [1024, 2048]),
                   ('optimizer', ['csa_annealer']),
-                  ('init_temp', [30.0]),
+                  ('init_temp', [5.0]),
                   ('learning_rate', [1e-3]),
-                  ('max_steps', [30000]),
+                  ('max_steps', [50000]),
                   ('batch_interval', [1, 10, 100, 1000, 1000000])]
 
     # Translate the design structure into flag strings.

@@ -27,11 +27,11 @@ def main(FLAGS):
     exp_design = [('rep_num', range(5)),
                   ('train_batch_size', [1024]),
                   ('optimizer', ['gsa_annealer']),
-                  ('init_temp', [30.0]),
-                  ('learning_rate', [1e-3]),
+                  ('init_temp', [5.0, 10.0]),
+                  ('learning_rate', [1e-2, 1e-3, 1e-4]),
                   ('max_steps', [50000]),
                   ('batch_interval', [1000]),
-                  ('gsa_q', [1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75])]
+                  ('gsa_q', [1.25, 1.75, 2.25, 2.75])]
 
     # Translate the design structure into flag strings.
     exp_flag_strings = [['--' + f + '=' + str(v) for v in r]

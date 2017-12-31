@@ -8,7 +8,7 @@ plt.style.use('ggplot')
 
 df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa_gsa_study.csv')
 
-df = df.sort_values(['batch_interval', 'train_batch_size'])
+df = df.sort_values(['gsa_q'])
 
 def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):
 
@@ -31,10 +31,10 @@ fig = plt.figure()
 
 plot_num = 0
 
-row_content = df.train_batch_size
+row_content = df.batch_interval
 row_levels = row_content.unique()
 
-col_content = df.batch_interval
+col_content = df.gsa_q
 col_levels = col_content.unique()
 
 intraplot_content = df.learning_rate
@@ -82,13 +82,13 @@ for i, row_level in enumerate(row_levels):
 
         # if plot_error:
 
-        # train_loss_mean = run_df.groupby(['step_num'])['train_error'].mean().tolist()
-        # train_loss_std = run_df.groupby(['step_num'])['train_error'].std().tolist()
+        train_loss_mean = run_df.groupby(['step_num'])['train_error'].mean().tolist()
+        train_loss_std = run_df.groupby(['step_num'])['train_error'].std().tolist()
 
-        # val_loss_mean = run_df.groupby(['step_num'])['val_error'].mean().tolist()
-        # val_loss_std = run_df.groupby(['step_num'])['val_error'].std().tolist()
+        val_loss_mean = run_df.groupby(['step_num'])['val_error'].mean().tolist()
+        val_loss_std = run_df.groupby(['step_num'])['val_error'].std().tolist()
 
-        # ax.set_ylim(0, 1)
+        ax.set_ylim(0, 1)
 
         print(len(val_loss_mean))
 
