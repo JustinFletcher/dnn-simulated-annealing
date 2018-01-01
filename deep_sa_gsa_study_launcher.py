@@ -27,9 +27,9 @@ def main(FLAGS):
     exp_design = [('rep_num', range(5)),
                   ('train_batch_size', [1024]),
                   ('optimizer', ['gsa_annealer']),
-                  ('init_temp', [5.0, 10.0]),
-                  ('learning_rate', [1e-2, 1e-3, 1e-4]),
-                  ('max_steps', [50000]),
+                  ('init_temp', [0.0, 5.0, 10000.0]),
+                  ('learning_rate', [10, 1e-3, 1e-6, 1e-10]),
+                  ('max_steps', [25000]),
                   ('batch_interval', [1000]),
                   ('gsa_q', [1.25, 1.75, 2.25, 2.75])]
 
