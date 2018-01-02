@@ -24,17 +24,16 @@ def main(FLAGS):
     tf.gfile.MakeDirs(FLAGS.log_dir)
 
     # # Declare experimental flags.
-    exp_design = [('rep_num', range(5)),
-                  ('train_batch_size', [128, 2048, 8192]),
-                  ('optimizer', ['csa_annealer',
+    exp_design = [('rep_num', range(30)),
+                  ('train_batch_size', [1024]),
+                  ('optimizer', ['sgd'
+                                 'csa_annealer',
                                  'fsa_annealer',
-                                 'gsa_annealer',
                                  'layerwise_csa_annealer',
-                                 'layerwise_fsa_annealer',
-                                 'layerwise_gsa_annealer']),
+                                 'layerwise_fsa_annealer',]),
                   ('init_temp', [5.0]),
-                  ('learning_rate', [1e-2, 1e-3, 1e-4, 1e-5, 1e-6]),
-                  ('batch_interval', [1000000])]
+                  ('learning_rate', [1e-3, 1e-4, 1e-5]),
+                  ('batch_interval', [1000])]
 
     # exp_design = [('rep_num', range(2)),
     #               ('train_batch_size', [128]),
@@ -254,11 +253,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--log_dir', type=str,
-                        default='../log/deep_sa/',
+                        default='../log/deep_sa_comparitive_study/',
                         help='Summaries log directory.')
 
     parser.add_argument('--log_filename', type=str,
-                        default='deep_sa.csv',
+                        default='deep_sa_comparitive_study.csv',
                         help='Merged output filename.')
 
     parser.add_argument('--max_runtime', type=int,

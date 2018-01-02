@@ -1,14 +1,20 @@
 from __future__ import print_function
 
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
-plt.style.use('ggplot')
+matplotlib.rcParams['text.usetex'] = True
+matplotlib.rcParams['text.latex.unicode'] = True
+matplotlib.rcParams.update({'font.size': 6})
+
+plt.style.use('seaborn-whitegrid')
 
 df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa_batch_interval_study.csv')
 
 df = df.sort_values(['batch_interval', 'train_batch_size'])
+
 
 def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):
 
@@ -24,7 +30,8 @@ def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):
         ymin, ymax = yerr
 
     # ax.plot(x, y)
-    ax.fill_between(x, ymax, ymin, alpha=alpha_fill, color=color)
+    ax.fill_between(x, ymax, ymin, alpha=alpha_fill, color=color,
+                    zorder=0)
 
 
 fig = plt.figure()
@@ -52,15 +59,17 @@ for i, row_level in enumerate(row_levels):
                              len(col_levels),
                              plot_num)
 
+        ax.set_rasterization_zorder(1)
+
         show_xlabel = len(row_levels) == (i + 1)
 
         show_ylabel = j == 0
 
         annotate_col = i == 0
-        col_annotation = 'Batch Interval: \n' + str(col_level)
+        col_annotation = r'$I_B = ' + str(col_level) + '$'
 
         annotate_row = j == 0
-        row_annotation = 'Train Set Size: \n' + str(row_level)
+        row_annotation = r'$ | \textbf{B} |  = ' + str(row_level) + '$'
 
         # ax.set_xlim(0.00001, 10)
         # ax.set_ylim(0.001, 1)
@@ -78,7 +87,7 @@ for i, row_level in enumerate(row_levels):
 
         # ax.set_yscale("log", nonposx='clip')
 
-        ax.set_ylim(0.01, 15)
+        ax.set_ylim(0.01, 10)
 
         # if plot_error:
 
@@ -98,8 +107,9 @@ for i, row_level in enumerate(row_levels):
 
         line, = ax.plot(step,
                         val_loss_mean,
-                        label='Validation Loss',
-                        alpha=0.5)
+                        label=r'Validation Loss ($ \mu \pm \sigma$)',
+                        alpha=0.5,
+                        zorder=0)
 
         errorfill(step,
                   val_loss_mean,
@@ -111,8 +121,9 @@ for i, row_level in enumerate(row_levels):
                 train_loss_mean,
                 "--",
                 color=line.get_color(),
-                label='Training Loss',
-                alpha=0.5)
+                label=r'Training Loss ($ \mu $)',
+                alpha=0.5,
+                zorder=0)
 
         # errorfill(step,
         #           train_loss_mean,
@@ -128,27 +139,43 @@ for i, row_level in enumerate(row_levels):
 
         if show_ylabel:
 
-            ax.set_ylabel('Validation Set Loss (mean, std)')
+            ax.set_ylabel('Loss')
 
         else:
 
             ax.yaxis.set_ticklabels([])
 
         if annotate_col:
-            pad = 10
+            pad = 5
             ax.annotate(col_annotation, xy=(0.5, 1), xytext=(0, pad),
                         xycoords='axes fraction', textcoords='offset points',
                         size='large', ha='center', va='baseline')
 
         if annotate_row:
-            pad = -100
-            ax.annotate(row_annotation, xy=(0, 0.55), xytext=(pad, 0),
+            pad = -25
+            ax.annotate(row_annotation, xy=(0, 0.6), xytext=(pad, 0),
                         rotation=90,
                         xycoords='axes fraction', textcoords='offset points',
                         size='large', ha='center', va='baseline')
 
-plt.legend()
 
-plt.suptitle("Generalization and Training Loss of SGD and SA by Training Set Size")
+plt.grid(True,
+         zorder=0)
+plt.legend(bbox_to_anchor=(0.5, 0.0),
+           loc="lower left",
+           mode="expand",
+           bbox_transform=fig.transFigure,
+           borderaxespad=0,
+           ncol=3)
 
+plt.tight_layout(rect=(0.05, 0.05, 0.95, 0.925))
+
+fig.set_size_inches(7.1, 3.5)
+
+plt.suptitle("Impact of Batch Replacement Interval $(I_B)$ on Validation and Training Set Loss")
+fig.savefig('C:\\Users\\Justi\\Research\\61\\synaptic_annealing\\figures\\deep_sa_batch_interval_study.eps',
+            rasterized=True,
+            dpi=600,
+            bbox_inches='tight',
+            pad_inches=0.05)
 plt.show()

@@ -1,14 +1,16 @@
 from __future__ import print_function
 
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
+matplotlib.rcParams['text.usetex'] = True
+matplotlib.rcParams['text.latex.unicode'] = True
 
-plt.style.use('ggplot')
-
+plt.style.use('seaborn-whitegrid')
 df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa_gsa_study.csv')
 
-df = df.sort_values(['gsa_q'])
+df = df.sort_values(['gsa_q', 'learning_rate', 'init_temp'])
 
 def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):
 
@@ -39,6 +41,7 @@ col_levels = col_content.unique()
 
 intraplot_content = df.init_temp
 intraplot_levels = intraplot_content.unique()
+intraplot_content_str = r'T_0'
 
 
 for i, row_level in enumerate(row_levels):
@@ -99,7 +102,11 @@ for i, row_level in enumerate(row_levels):
 
             line, = ax.plot(step,
                             val_loss_mean,
-                            label='Validation Loss',
+                            label=r'Validation Loss ($' +
+                                  intraplot_content_str +
+                                  '=' +
+                                  str(intraplot_level) +
+                                  '$)',
                             alpha=0.5)
 
             errorfill(step,
@@ -112,7 +119,11 @@ for i, row_level in enumerate(row_levels):
                     train_loss_mean,
                     "--",
                     color=line.get_color(),
-                    label='Training Loss',
+                    label=r'Training Loss ($' +
+                          intraplot_content_str +
+                          '=' +
+                          str(intraplot_level) +
+                          '$)',
                     alpha=0.5)
 
             # errorfill(step,

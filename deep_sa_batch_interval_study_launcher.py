@@ -30,7 +30,7 @@ def main(FLAGS):
                   ('init_temp', [5.0]),
                   ('learning_rate', [1e-3]),
                   ('max_steps', [50000]),
-                  ('batch_interval', [1, 10, 100, 1000, 1000000])]
+                  ('batch_interval', [10000])]
 
     # Translate the design structure into flag strings.
     exp_flag_strings = [['--' + f + '=' + str(v) for v in r]
