@@ -10,6 +10,6 @@
 ## Enter the proper queue
 #PBS -q standard
 #PBS -A MHPCC96670DA1 
-cp -R ~/data $WORKDIRc
+cp -R ~/data $WORKDIR
 cd ~/dnn-simulated-annealing
 python deep_sa_generalization_study_launcher.py
