@@ -11,7 +11,7 @@ matplotlib.rcParams.update({'font.size': 6})
 
 plt.style.use('seaborn-whitegrid')
 
-df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa_comparitive_study.csv')
+df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa_generalization_study.csv')
 
 df = df.sort_values(['batch_interval', 'learning_rate'])
 
