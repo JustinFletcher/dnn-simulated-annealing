@@ -53,7 +53,6 @@ def main(FLAGS):
             experimental_configs.append(e + tuple(c))
 
 
-
     # Shuffle the submission order of configs to avoid asymetries.
     random.shuffle(experimental_configs)
 
@@ -126,8 +125,6 @@ def main(FLAGS):
     jobs_complete = False
     timeout = False
     elapsed_time = 0
-
-    exit()
 
     # Loop until timeout or all jobs complete.
     while not(jobs_complete) and not(timeout):
