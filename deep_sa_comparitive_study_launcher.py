@@ -194,7 +194,7 @@ class Experiment(object):
                 print("Unknown manager supplied to launch_experiment().")
                 exit()
 
-    def join_job_ouput(self, log_dir, log_filename, max_runtime):
+    def join_job_output(self, log_dir, log_filename, max_runtime):
 
         jobs_complete = False
         timeout = False
