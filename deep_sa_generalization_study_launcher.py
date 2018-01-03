@@ -24,7 +24,7 @@ def main(FLAGS):
     tf.gfile.MakeDirs(FLAGS.log_dir)
 
     # Declare experimental flags.
-    exp_design = [('rep_num', range(3)),
+    exp_design = [('rep_num', range(30)),
                   ('train_batch_size', [10, 100, 1000, 10000]),
                   ('init_temp', [5.0]),
                   ('learning_rate', [1e-3]),
