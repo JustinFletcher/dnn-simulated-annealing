@@ -10,7 +10,6 @@
 ## Enter the proper queue
 #PBS -q standard
 #PBS -A MHPCC96670DA1 
-cp -R ~/data $WORKDIR
-module load anaconda2/5.0.1 gcc/5.3.0 cudnn/6.0
+cp -R ~/data $WORKDIRc
 cd ~/dnn-simulated-annealing
 python deep_sa_generalization_study_launcher.py

@@ -24,7 +24,7 @@ def main(FLAGS):
     # tf.gfile.MakeDirs(FLAGS.log_dir)
 
     # Declare experimental flags.
-    exp_design = [('rep_num', range(30)),
+    exp_design = [('rep_num', range(3)),
                   ('train_batch_size', [10, 100, 1000, 10000]),
                   ('init_temp', [5.0]),
                   ('learning_rate', [1e-3]),
@@ -33,8 +33,6 @@ def main(FLAGS):
     # Translate the design structure into flag strings.
     exp_flag_strings = [['--' + f + '=' + str(v) for v in r]
                         for (f, r) in exp_design]
-    print(exp_flag_strings)
-
     # Produce the Cartesian set of configurations.
     indep_experimental_configs = list(itertools.product(*exp_flag_strings))
 
@@ -54,6 +52,8 @@ def main(FLAGS):
             # ...join the coupled config to the independent one.
             experimental_configs.append(e + tuple(c))
 
+
+
     # Shuffle the submission order of configs to avoid asymetries.
     random.shuffle(experimental_configs)
 
@@ -69,10 +69,10 @@ def main(FLAGS):
         print("---------------------------------------")
 
         # Use subproces to command qsub to submit a job.
-        p = subprocess.Popen('qsub',
-                             stdin=subprocess.PIPE,
-                             stdout=subprocess.PIPE,
-                             shell=True)
+        # p = subprocess.Popen('qsub',
+        #                      stdin=subprocess.PIPE,
+        #                      stdout=subprocess.PIPE,
+        #                      shell=True)
 
         # Customize your options here.
         job_name = "dist_ex_%d" % i
@@ -118,7 +118,7 @@ def main(FLAGS):
         print(job_string)
 
         # Send job_string to qsub.
-        job_ids.append(p.communicate(job_string)[0])
+        # job_ids.append(p.communicate(job_string)[0])
         time.sleep(1)
 
         print("-----------------")
@@ -126,6 +126,8 @@ def main(FLAGS):
     jobs_complete = False
     timeout = False
     elapsed_time = 0
+
+    exit()
 
     # Loop until timeout or all jobs complete.
     while not(jobs_complete) and not(timeout):
