@@ -398,7 +398,7 @@ def main(FLAGS):
     # print(exp.get_parameter_labels())
     # exit()
 
-    exp.launch_experiment(FLAGS.exp_filename, FLAGS.log_dir)
+    exp.launch_experiment(FLAGS.experiment_py_file, FLAGS.log_dir)
 
     # # Shuffle the submission order of configs to avoid asymetries.
     # random.shuffle(experimental_configs)
