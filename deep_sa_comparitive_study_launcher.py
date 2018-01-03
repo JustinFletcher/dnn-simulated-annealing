@@ -189,10 +189,10 @@ class Experiment(object):
                 self._job_ids.append(p.communicate(job_string)[0])
                 time.sleep(1)
 
-        else:
+            else:
 
-            print("Unknown manager supplied to launch_experiment().")
-            exit()
+                print("Unknown manager supplied to launch_experiment().")
+                exit()
 
     def join_job_ouput(self, log_dir, log_filename, max_runtime):
 
