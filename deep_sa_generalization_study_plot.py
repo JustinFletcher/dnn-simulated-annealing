@@ -13,7 +13,7 @@ plt.style.use('seaborn-whitegrid')
 
 df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa_generalization_study.csv')
 
-df = df.sort_values(['batch_interval', 'learning_rate'])
+df = df.sort_values(['optimizer', 'train_batch_size'])
 
 
 def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):
@@ -38,7 +38,7 @@ fig = plt.figure()
 
 plot_num = 0
 
-row_content =  df.learning_rate
+row_content =  df.train_batch_size
 row_levels = row_content.unique()
 
 col_content = df.optimizer
@@ -85,7 +85,7 @@ for i, row_level in enumerate(row_levels):
         val_loss_mean = run_df.groupby(['step_num'])['val_loss'].mean().tolist()
         val_loss_std = run_df.groupby(['step_num'])['val_loss'].std().tolist()
 
-        # ax.set_yscale("log", nonposx='clip')
+        ax.set_yscale("log", nonposx='clip')
 
         ax.set_ylim(0.01, 15)
 
