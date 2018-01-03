@@ -67,10 +67,10 @@ def main(FLAGS):
         print("---------------------------------------")
 
         # Use subproces to command qsub to submit a job.
-        # p = subprocess.Popen('qsub',
-        #                      stdin=subprocess.PIPE,
-        #                      stdout=subprocess.PIPE,
-        #                      shell=True)
+        p = subprocess.Popen('qsub',
+                             stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE,
+                             shell=True)
 
         # Customize your options here.
         job_name = "dist_ex_%d" % i
@@ -116,7 +116,7 @@ def main(FLAGS):
         print(job_string)
 
         # Send job_string to qsub.
-        # job_ids.append(p.communicate(job_string)[0])
+        job_ids.append(p.communicate(job_string)[0])
         time.sleep(1)
 
         print("-----------------")
