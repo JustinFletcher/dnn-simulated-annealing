@@ -24,15 +24,14 @@ def main(FLAGS):
     tf.gfile.MakeDirs(FLAGS.log_dir)
 
     # # Declare experimental flags.
-    exp_design = [('rep_num', range(30)),
+    exp_design = [('rep_num', range(15)),
                   ('train_batch_size', [1024]),
-                  ('optimizer', ['sgd'
-                                 'csa_annealer',
+                  ('optimizer', ['csa_annealer',
                                  'fsa_annealer',
                                  'layerwise_csa_annealer',
-                                 'layerwise_fsa_annealer',]),
+                                 'layerwise_fsa_annealer']),
                   ('init_temp', [5.0]),
-                  ('learning_rate', [1e-3, 1e-4, 1e-5]),
+                  ('learning_rate', [1e-3, 1e-4, 1e-5, 1e-6]),
                   ('batch_interval', [1000])]
 
     # exp_design = [('rep_num', range(2)),
