@@ -17,11 +17,11 @@ import tensorflow as tf
 
 def main(FLAGS):
 
-    # if tf.gfile.Exists(FLAGS.log_dir):
+    if tf.gfile.Exists(FLAGS.log_dir):
 
-    #     tf.gfile.DeleteRecursively(FLAGS.log_dir)
+        tf.gfile.DeleteRecursively(FLAGS.log_dir)
 
-    # tf.gfile.MakeDirs(FLAGS.log_dir)
+    tf.gfile.MakeDirs(FLAGS.log_dir)
 
     # Declare experimental flags.
     exp_design = [('rep_num', range(3)),
@@ -51,7 +51,6 @@ def main(FLAGS):
 
             # ...join the coupled config to the independent one.
             experimental_configs.append(e + tuple(c))
-
 
     # Shuffle the submission order of configs to avoid asymetries.
     random.shuffle(experimental_configs)
