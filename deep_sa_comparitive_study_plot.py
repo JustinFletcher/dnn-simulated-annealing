@@ -13,7 +13,7 @@ plt.style.use('seaborn-whitegrid')
 
 df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa_comparitive_study.csv')
 
-df = df.sort_values(['batch_interval', 'learning_rate'])
+df = df.sort_values(['optimizer', 'learning_rate'])
 
 
 def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):

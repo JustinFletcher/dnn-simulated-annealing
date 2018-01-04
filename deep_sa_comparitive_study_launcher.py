@@ -388,18 +388,17 @@ def main(FLAGS):
     exp.add_design('init_temp', [5.0])
     exp.add_design('learning_rate', [1e-3, 1e-4])
     exp.add_design('max_steps', [5000])
-    exp.add_design('optimizer', ['sgd'])
 
-    # exp.add_coupled_design([[('optimizer', ['sgd']),
-    #                          ('batch_interval', [1])
-    #                          ],
-    #                         [('optimizer', ['csa_annealer',
-    #                                         'fsa_annealer',
-    #                                         'gsa_annealer',
-    #                                         'layerwise_csa_annealer',
-    #                                         'layerwise_fsa_annealer',
-    #                                         'layerwise_gsa_annealer']),
-    #                          ('batch_interval', [1000, 100000])]])
+    exp.add_coupled_design([[('optimizer', ['sgd']),
+                             ('batch_interval', [1])
+                             ],
+                            [('optimizer', ['csa_annealer',
+                                            'fsa_annealer',
+                                            'gsa_annealer',
+                                            'layerwise_csa_annealer',
+                                            'layerwise_fsa_annealer',
+                                            'layerwise_gsa_annealer']),
+                             ('batch_interval', [1000, 100000])]])
 
     # experimental_configs = exp.get_configs()
 
