@@ -163,7 +163,8 @@ class Experiment(object):
                                     log_filename)
 
                 self._input_output_maps.append(input_output_map)
-
+                
+                # qsub -I -X -l walltime=0:30:00 -l select=1:ncpus=20:mpiprocs=20 -l place=scatter:excl -A MHPCC96670DA1 -q debug -V
                 # Build the job string.
                 job_string = """#!/bin/bash
                 #PBS -N %s
@@ -378,15 +379,18 @@ def main(FLAGS):
     exp.add_design('init_temp', [5.0])
     exp.add_design('learning_rate', [1e-3, 1e-4])
     exp.add_design('max_steps', [5000])
+    exp.add_design('optimizer', ['sgd'])
 
-    exp.add_coupled_design([[('optimizer', ['sgd']),
-                             ('batch_interval', [1])
-                             ],
-                            [('optimizer', ['csa_annealer',
-                                            'fsa_annealer',
-                                            'layerwise_csa_annealer',
-                                            'layerwise_fsa_annealer']),
-                             ('batch_interval', [1000])]])
+    # exp.add_coupled_design([[('optimizer', ['sgd']),
+    #                          ('batch_interval', [1])
+    #                          ],
+    #                         [('optimizer', ['csa_annealer',
+    #                                         'fsa_annealer',
+    #                                         'gsa_annealer',
+    #                                         'layerwise_csa_annealer',
+    #                                         'layerwise_fsa_annealer',
+    #                                         'layerwise_gsa_annealer']),
+    #                          ('batch_interval', [1000, 100000])]])
 
     # experimental_configs = exp.get_configs()
 
