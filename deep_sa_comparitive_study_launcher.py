@@ -74,17 +74,26 @@ class Experiment(object):
 
                 coupled_configs += list(itertools.product(*coupled_flag_strs))
 
-        # Initialize empty experimental configs list.
+        # Initialize empty experimental configs list...
         experimental_configs = []
 
-        # Iterate over each independent config...
-        for e in indep_experimental_configs:
+        # ...and if there are coupled configs...
+        if coupled_configs:
 
-            # ...and for each coupled config...
-            for c in coupled_configs:
+            # ...iterate over each independent config...
+            for e in indep_experimental_configs:
 
-                # ...join the coupled config to the independent one.
-                experimental_configs.append(e + tuple(c))
+                    # ...then for each coupled config...
+                    for c in coupled_configs:
+
+                        # ...join the coupled config to the independent one.
+                        experimental_configs.append(e + tuple(c))
+
+        # Otherwise, ....
+        else:
+
+            # ...just pass the independent experiments through.
+            experimental_configs = indep_experimental_configs
 
         return(experimental_configs)
 
