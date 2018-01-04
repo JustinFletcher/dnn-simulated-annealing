@@ -327,7 +327,7 @@ def main(FLAGS):
     exp = Experiment()
 
     # Set the number of reps for each config.
-    exp.set_rep_count(30)
+    exp.set_rep_count(15)
 
     # Set independent parameters.
     exp.add_design('train_batch_size', [1024])
