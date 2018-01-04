@@ -38,13 +38,13 @@ fig = plt.figure()
 
 plot_num = 0
 
-row_content =  df.learning_rate
+row_content = df.learning_rate
 row_levels = row_content.unique()
 
 col_content = df.optimizer
 col_levels = col_content.unique()
 
-intraplot_content = df.learning_rate
+intraplot_content = df.batch_interval
 intraplot_levels = intraplot_content.unique()
 
 
@@ -69,94 +69,100 @@ for i, row_level in enumerate(row_levels):
         col_annotation = r'$' + str(col_level) + '$'
 
         annotate_row = j == 0
-        row_annotation = r'$alpha= ' + str(row_level) + '$'
+        row_annotation = r'$/alpha= ' + str(row_level) + '$'
 
         # ax.set_xlim(0.00001, 10)
         # ax.set_ylim(0.001, 1)
 
-        run_df = df.loc[(row_content == row_level) &
-                        (col_content == col_level)]
 
-        # if plot_loss:
+        for k, intraplot_level in enumerate(intraplot_levels):
 
-        train_loss_mean = run_df.groupby(['step_num'])['train_loss'].mean().tolist()
-        train_loss_std = run_df.groupby(['step_num'])['train_loss'].std().tolist()
+            run_df = df.loc[(row_content == row_level) &
+                            (col_content == col_level) &
+                            (intraplot_content == intraplot_level)]
 
-        val_loss_mean = run_df.groupby(['step_num'])['val_loss'].mean().tolist()
-        val_loss_std = run_df.groupby(['step_num'])['val_loss'].std().tolist()
+            # if plot_loss:
 
-        # ax.set_yscale("log", nonposx='clip')
+            train_loss_mean = run_df.groupby(['step_num'])['train_loss'].mean().tolist()
+            train_loss_std = run_df.groupby(['step_num'])['train_loss'].std().tolist()
 
-        ax.set_ylim(0.01, 15)
+            val_loss_mean = run_df.groupby(['step_num'])['val_loss'].mean().tolist()
+            val_loss_std = run_df.groupby(['step_num'])['val_loss'].std().tolist()
 
-        # if plot_error:
+            # ax.set_yscale("log", nonposx='clip')
 
-        # train_loss_mean = run_df.groupby(['step_num'])['train_error'].mean().tolist()
-        # train_loss_std = run_df.groupby(['step_num'])['train_error'].std().tolist()
+            # ax.loglog()
 
-        # val_loss_mean = run_df.groupby(['step_num'])['val_error'].mean().tolist()
-        # val_loss_std = run_df.groupby(['step_num'])['val_error'].std().tolist()
+            ax.set_ylim(0.0001, 10)
 
-        # ax.set_ylim(0, 1)
+            # if plot_error:
 
-        print(len(val_loss_mean))
+            # train_loss_mean = run_df.groupby(['step_num'])['train_error'].mean().tolist()
+            # train_loss_std = run_df.groupby(['step_num'])['train_error'].std().tolist()
 
-        step = run_df['step_num']
-        step = run_df.groupby(['step_num'])['step_num'].mean().tolist()
-        print(len(step))
+            # val_loss_mean = run_df.groupby(['step_num'])['val_error'].mean().tolist()
+            # val_loss_std = run_df.groupby(['step_num'])['val_error'].std().tolist()
 
-        line, = ax.plot(step,
-                        val_loss_mean,
-                        label=r'Validation Loss ($ \mu \pm \sigma$)',
-                        alpha=0.5,
-                        zorder=0)
+            # ax.set_ylim(0, 1)
 
-        errorfill(step,
-                  val_loss_mean,
-                  val_loss_std,
-                  color=line.get_color(),
-                  alpha_fill=0.3, ax=ax)
+            print(len(val_loss_mean))
 
-        ax.plot(step,
-                train_loss_mean,
-                "--",
-                color=line.get_color(),
-                label=r'Training Loss ($ \mu $)',
-                alpha=0.5,
-                zorder=0)
+            step = run_df['step_num']
+            step = run_df.groupby(['step_num'])['step_num'].mean().tolist()
+            print(len(step))
 
-        # errorfill(step,
-        #           train_loss_mean,
-        #           train_loss_std, color=None, alpha_fill=0.3, ax=ax)
+            line, = ax.plot(step,
+                            val_loss_mean,
+                            label=r'Validation Loss ($ \mu \pm \sigma$)',
+                            alpha=0.5,
+                            zorder=0)
 
-        if show_xlabel:
+            errorfill(step,
+                      val_loss_mean,
+                      val_loss_std,
+                      color=line.get_color(),
+                      alpha_fill=0.3, ax=ax)
 
-            ax.set_xlabel('Training Step')
+            ax.plot(step,
+                    train_loss_mean,
+                    "--",
+                    color=line.get_color(),
+                    label=r'Training Loss ($ \mu $)',
+                    alpha=0.5,
+                    zorder=0)
 
-        else:
+            # errorfill(step,
+            #           train_loss_mean,
+            #           train_loss_std, color=None, alpha_fill=0.3, ax=ax)
 
-            ax.xaxis.set_ticklabels([])
+            if show_xlabel:
 
-        if show_ylabel:
+                ax.set_xlabel('Training Step')
 
-            ax.set_ylabel('Loss')
+            else:
 
-        else:
+                ax.xaxis.set_ticklabels([])
 
-            ax.yaxis.set_ticklabels([])
+            if show_ylabel:
 
-        if annotate_col:
-            pad = 5
-            ax.annotate(col_annotation, xy=(0.5, 1), xytext=(0, pad),
-                        xycoords='axes fraction', textcoords='offset points',
-                        size='large', ha='center', va='baseline')
+                ax.set_ylabel('Loss')
 
-        if annotate_row:
-            pad = -25
-            ax.annotate(row_annotation, xy=(0, 0.6), xytext=(pad, 0),
-                        rotation=90,
-                        xycoords='axes fraction', textcoords='offset points',
-                        size='large', ha='center', va='baseline')
+            else:
+
+                ax.yaxis.set_ticklabels([])
+
+            if annotate_col:
+                pad = 5
+                ax.annotate(col_annotation, xy=(0.5, 1), xytext=(0, pad),
+                            xycoords='axes fraction', textcoords='offset points',
+                            size='large', ha='center', va='baseline')
+
+            if annotate_row:
+                pad = -25
+                ax.annotate(row_annotation, xy=(0, 0.6), xytext=(pad, 0),
+                            rotation=90,
+                            xycoords='axes fraction', textcoords='offset points',
+                            size='large', ha='center', va='baseline')
 
 
 plt.grid(True,
