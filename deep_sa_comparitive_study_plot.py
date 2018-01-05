@@ -15,6 +15,10 @@ df = pd.read_csv('C:/Users/Justi/Research/log/deep_sa/deep_sa_comparitive_study.
 
 df = df.sort_values(['optimizer', 'learning_rate'])
 
+# df = df.drop(df[df.optimizer == 'sgd'].index)
+df = df.drop(df[df.learning_rate != 0.001].index)
+df = df.drop(df[(df.batch_interval == 1000)].index)
+df = df.drop(df[(df.batch_interval == 100000)].index)
 
 def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):
 
@@ -41,19 +45,21 @@ plot_num = 0
 row_content = df.learning_rate
 row_levels = row_content.unique()
 
-col_content = df.optimizer
+col_content = df.learning_rate
 col_levels = col_content.unique()
 
-intraplot_content = df.batch_interval
+intraplot_content = df.optimizer
 intraplot_levels = intraplot_content.unique()
 
 
 for i, row_level in enumerate(row_levels):
 
+
     for j, col_level in enumerate(col_levels):
 
-        # Create scatter axis here.
         plot_num += 1
+
+        # Create scatter axis here.
 
         ax = fig.add_subplot(len(row_levels),
                              len(col_levels),
@@ -66,14 +72,13 @@ for i, row_level in enumerate(row_levels):
         show_ylabel = j == 0
 
         annotate_col = i == 0
-        col_annotation = r'$' + str(col_level) + '$'
+        col_annotation = r'$ \alpha = ' + str(col_level) + '$'
 
         annotate_row = j == 0
-        row_annotation = r'$/alpha= ' + str(row_level) + '$'
+        row_annotation = '  $' + str(row_level) + ' $ '
 
         # ax.set_xlim(0.00001, 10)
         # ax.set_ylim(0.001, 1)
-
 
         for k, intraplot_level in enumerate(intraplot_levels):
 
@@ -82,6 +87,9 @@ for i, row_level in enumerate(row_levels):
                             (intraplot_content == intraplot_level)]
 
             # if plot_loss:
+
+            mean_running_time = run_df['mean_running_time'].mean()
+            print(mean_running_time)
 
             train_loss_mean = run_df.groupby(['step_num'])['train_loss'].mean().tolist()
             train_loss_std = run_df.groupby(['step_num'])['train_loss'].std().tolist()
@@ -93,7 +101,8 @@ for i, row_level in enumerate(row_levels):
 
             # ax.loglog()
 
-            ax.set_ylim(0.0001, 10)
+            ax.set_ylim(0.001, 15)
+            ax.set_xlim(1, 1000)
 
             # if plot_error:
 
@@ -109,11 +118,12 @@ for i, row_level in enumerate(row_levels):
 
             step = run_df['step_num']
             step = run_df.groupby(['step_num'])['step_num'].mean().tolist()
-            print(len(step))
+
+            step = [mean_running_time * s for s in step]
 
             line, = ax.plot(step,
                             val_loss_mean,
-                            label=r'Validation Loss ($ \mu \pm \sigma$)',
+                            label=r'$'+intraplot_level+'$',
                             alpha=0.5,
                             zorder=0)
 
@@ -123,21 +133,23 @@ for i, row_level in enumerate(row_levels):
                       color=line.get_color(),
                       alpha_fill=0.3, ax=ax)
 
-            ax.plot(step,
-                    train_loss_mean,
-                    "--",
-                    color=line.get_color(),
-                    label=r'Training Loss ($ \mu $)',
-                    alpha=0.5,
-                    zorder=0)
+            # ax.plot(step,
+            #         train_loss_mean,
+            #         "--",
+            #         color=line.get_color(),
+            #         label=r'Training Loss ($ \mu $)',
+            #         alpha=0.5,
+            #         zorder=0)
 
             # errorfill(step,
             #           train_loss_mean,
             #           train_loss_std, color=None, alpha_fill=0.3, ax=ax)
 
+            plt.legend()
+
             if show_xlabel:
 
-                ax.set_xlabel('Training Step')
+                ax.set_xlabel(r'Running Time ($s$)')
 
             else:
 
@@ -167,18 +179,19 @@ for i, row_level in enumerate(row_levels):
 
 plt.grid(True,
          zorder=0)
-plt.legend(bbox_to_anchor=(0.5, 0.0),
-           loc="lower left",
-           mode="expand",
-           bbox_transform=fig.transFigure,
-           borderaxespad=0,
-           ncol=3)
+
+# plt.legend(bbox_to_anchor=(0.5, 0.0),
+#            loc="lower left",
+#            mode="expand",
+#            bbox_transform=fig.transFigure,
+#            borderaxespad=0,
+#            ncol=3)
 
 plt.tight_layout(rect=(0.05, 0.05, 0.95, 0.925))
 
 fig.set_size_inches(7.1, 3.5)
 
-plt.suptitle("Impact of Batch Replacement Interval $(I_B)$ on Validation and Training Set Loss")
+plt.suptitle("Comparative Results oif Syanptic Annealing and Stochastic Gradient Descent Optimization")
 fig.savefig('C:\\Users\\Justi\\Research\\61\\synaptic_annealing\\figures\\deep_sa_comparative_study.eps',
             rasterized=True,
             dpi=600,

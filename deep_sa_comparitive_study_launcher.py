@@ -327,12 +327,12 @@ def main(FLAGS):
     exp = Experiment()
 
     # Set the number of reps for each config.
-    exp.set_rep_count(15)
+    exp.set_rep_count(30)
 
     # Set independent parameters.
     exp.add_design('train_batch_size', [1024])
-    exp.add_design('init_temp', [5.0])
-    exp.add_design('learning_rate', [1e-3, 1e-4, 1e-5])
+    exp.add_design('init_temp', [5000.0])
+    exp.add_design('learning_rate', [0.001])
     exp.add_design('max_steps', [50000])
 
     # Set coupled parameters.
@@ -345,7 +345,7 @@ def main(FLAGS):
                                             'layerwise_csa_annealer',
                                             'layerwise_fsa_annealer',
                                             'layerwise_gsa_annealer']),
-                             ('batch_interval', [1000, 10000, 100000])]])
+                             ('batch_interval', [1000])]])
 
     # Launch the experiment.
     exp.launch_experiment(FLAGS.experiment_py_file, FLAGS.log_dir)
