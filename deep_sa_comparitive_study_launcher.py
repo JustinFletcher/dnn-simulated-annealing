@@ -331,7 +331,7 @@ def main(FLAGS):
 
     # Set independent parameters.
     exp.add_design('train_batch_size', [1024])
-    exp.add_design('init_temp', [5000.0])
+    exp.add_design('init_temp', [10, 50, 100, 250, 500, 1000, 2000])
     exp.add_design('learning_rate', [0.001])
     exp.add_design('max_steps', [50000])
 
@@ -339,13 +339,19 @@ def main(FLAGS):
     exp.add_coupled_design([[('optimizer', ['sgd']),
                              ('batch_interval', [1])
                              ],
-                            [('optimizer', ['csa_annealer',
-                                            'fsa_annealer',
-                                            'gsa_annealer',
-                                            'layerwise_csa_annealer',
-                                            'layerwise_fsa_annealer',
-                                            'layerwise_gsa_annealer']),
+                            [('optimizer', ['csa_annealer']),
                              ('batch_interval', [1000])]])
+
+    # exp.add_coupled_design([[('optimizer', ['sgd']),
+    #                          ('batch_interval', [1])
+    #                          ],
+    #                         [('optimizer', ['csa_annealer',
+    #                                         'fsa_annealer',
+    #                                         'gsa_annealer',
+    #                                         'layerwise_csa_annealer',
+    #                                         'layerwise_fsa_annealer',
+    #                                         'layerwise_gsa_annealer']),
+    #                          ('batch_interval', [1000])]])
 
     # Launch the experiment.
     exp.launch_experiment(FLAGS.experiment_py_file, FLAGS.log_dir)

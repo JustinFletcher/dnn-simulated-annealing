@@ -17,7 +17,7 @@ df = df.sort_values(['optimizer', 'learning_rate'])
 
 # df = df.drop(df[df.optimizer == 'sgd'].index)
 df = df.drop(df[df.learning_rate != 0.001].index)
-df = df.drop(df[(df.batch_interval == 1000)].index)
+df = df.drop(df[(df.batch_interval == 10000)].index)
 df = df.drop(df[(df.batch_interval == 100000)].index)
 
 def errorfill(x, y, yerr, color=None, alpha_fill=0.3, ax=None):
